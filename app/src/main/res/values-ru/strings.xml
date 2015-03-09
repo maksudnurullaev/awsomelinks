@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AWSomeLinks</string>
+    <string name="action_settings">Настройки</string>
+    <string name="edit_text">Введите сообщение</string>
+    <string name="button_send">Отправить</string>
+    <string name="title_activity_display_message">Показать сообщение</string>
+    <string name="action_search">Поиск</string>
+    <string name="Outbox">Исходящие</string>
+    <string name="Inbox">Входящие</string>
+    <string name="select_action">Выберите действие</string>
+    <string name="empty">Пусто</string>
+    <string name="add">Добавить</string>
+    <string name="Addresses">Адресная книга</string>
+    <string name="Images">Картинки</string>
+    <string name="Video">Видео</string>
+    <string name="from_camera">Камера</string>
+    <string name="from_gallery">Галерея</string>
+    <string name="file">Файл</string>
+</resources>

@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.awsomelinks.OutboxActivity">
+    <item android:id="@+id/action_addresses" android:title="@string/Addresses"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_images" android:title="@string/Images"
+        android:orderInCategory="101" app:showAsAction="never" >
+        <menu>
+            <item android:id="@+id/image_from_camera"
+                android:orderInCategory="100" android:title="@string/from_camera" />
+            <item android:id="@+id/image_from_gallery"
+                android:orderInCategory="101" android:title="@string/from_gallery" />
+        </menu>
+    </item>
+    <item android:id="@+id/action_video" android:title="@string/Video"
+        android:orderInCategory="102" app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/video_from_camera"
+                android:orderInCategory="100" android:title="@string/from_camera" />
+            <item android:id="@+id/video_from_gallery"
+                android:orderInCategory="101" android:title="@string/from_gallery" />
+        </menu>
+    </item>
+    <item android:id="@+id/action_file" android:title="@string/file"
+        android:orderInCategory="103" app:showAsAction="never" />
+</menu>
