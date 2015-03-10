@@ -1,19 +1,17 @@
 package com.awsomelinks;
 
-import android.content.Intent;
-import android.support.v4.app.Fragment;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.io.Serializable;
 import java.util.HashMap;
 
 public class MainActivity extends ActionBarActivity {
@@ -115,7 +113,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void clickDispatcher(View view) {
-        String _orientation = " Orientation: " + ( isDualMode() ? "Landscape" : "Portrait");
         switch (view.getId()) {
             case (R.id.inbox_button):
                 activateContent(ContentFragmentType.INBOX);

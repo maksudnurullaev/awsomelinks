@@ -13,8 +13,8 @@
             android:layout_height="wrap_content"
             android:text="@string/Inbox"
             android:id="@+id/textView2"
-            android:layout_gravity="left|bottom"
-            android:layout_marginLeft="5dp"
+            android:layout_gravity="start|bottom"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="5dp" />
     </FrameLayout>
     <LinearLayout
@@ -33,11 +33,4 @@
             android:background="@drawable/border_select_action"
             android:gravity="center"/>
     </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"></FrameLayout>
-
-
 </LinearLayout>

@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 /**
  * Created by m.nurullayev on 03.03.2015.
  */
-
 public class InboxFragment extends Fragment implements MainActivity.ContentFragment {
 
     public InboxFragment(){
