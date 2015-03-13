@@ -1,0 +1,1 @@
+Andriod application to linking people by sharing almost everything.
