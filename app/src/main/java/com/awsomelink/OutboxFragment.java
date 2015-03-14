@@ -1,4 +1,4 @@
-package com.awsomelinks;
+package com.awsomelink;
 
 import android.app.Activity;
 import android.content.Intent;

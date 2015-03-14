@@ -1,4 +1,4 @@
-package com.awsomelinks;
+package com.awsomelink;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

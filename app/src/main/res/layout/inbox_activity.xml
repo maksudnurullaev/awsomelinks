@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.awsomelinks.InboxActivity">
+    tools:context="com.awsomelink.InboxActivity">
 
     <RelativeLayout
         android:id="@+id/inbox_activity_fragment_place"

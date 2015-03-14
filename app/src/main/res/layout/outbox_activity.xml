@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.awsomelinks.OutboxActivity"
+    tools:context="com.awsomelink.OutboxActivity"
     tools:ignore="MergeRootFrame" >
     <RelativeLayout
         android:id="@+id/outbox_activity_fragment_place"

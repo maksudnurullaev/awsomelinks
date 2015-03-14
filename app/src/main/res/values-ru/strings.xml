@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AWSomeLinks</string>
+    <string name="app_name">AWSomeLink</string>
     <string name="action_settings">Настройки</string>
     <string name="edit_text">Введите сообщение</string>
     <string name="button_send">Отправить</string>

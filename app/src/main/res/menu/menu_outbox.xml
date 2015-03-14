@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.awsomelinks.OutboxActivity">
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.awsomelink.OutboxActivity">
     <item android:id="@+id/add_link_addresses" android:title="@string/Addresses"
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_images" android:title="@string/Images"

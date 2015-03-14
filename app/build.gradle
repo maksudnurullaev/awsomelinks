@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.awsomelinks.awsomelinks"
+        applicationId "com.awsomelink.awsomelink"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1

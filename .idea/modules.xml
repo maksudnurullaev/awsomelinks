@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AWSomeLinks.iml" filepath="$PROJECT_DIR$/AWSomeLinks.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/awsomelink.iml" filepath="$PROJECT_DIR$/awsomelink.iml" />
     </modules>
   </component>
 </project>
