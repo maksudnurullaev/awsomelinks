@@ -17,4 +17,6 @@
     <string name="from_camera">Камера</string>
     <string name="from_gallery">Галерея</string>
     <string name="file">Файл</string>
+    <string name="Contacts">Contacts</string>
+    <string name="Selected">Selected</string>
 </resources>

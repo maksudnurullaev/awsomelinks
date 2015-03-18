@@ -50,11 +50,12 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
     private void addLinkAddresses(){
         //getActivity().getContentResolver()
         //Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
-        startActivityForResult(intent, 1001);
         //super.startActivityForResult(i, 1001);
-
+        ///Intent intent = new Intent(Intent.ACTION_PICK);
+        ///intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
+        ///startActivityForResult(intent, 1001);
+        Intent i = new Intent(getActivity(),ContactsActivity.class);
+        startActivity(i);
     }
 
     @Override
