@@ -1,26 +1,21 @@
 package com.awsomelink;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.provider.ContactsContract;
 import android.support.v4.app.ListFragment;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.awsomelink.R;
-
-import com.awsomelink.utils.TestStableAdapter;
-import com.awsomelink.utils.TestStableAdapter;
-import com.awsomelink.utils.TestUtils;
 
 /**
  * A fragment representing a list of Items.
@@ -32,73 +27,43 @@ import com.awsomelink.utils.TestUtils;
  * interface.
  */
 public class ContactsFragment extends ListFragment implements AbsListView.OnItemClickListener {
-    View mHeaderView;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    //... Used for mass selecting actions
+    public enum SELECTION_ACTS { SELECTION_ALL, SELECTION_NONE, SELECTION_REVERSE }
     private OnFragmentInteractionListener mListener;
-
-    /**
-     * The fragment's ListView/GridView.
-     */
     private AbsListView mListView;
+    private SimpleCursorAdapter mAdapter;
 
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
-    private TestStableAdapter mAdapter;
-
-    // TODO: Rename and change types of parameters
-    public static ContactsFragment newInstance(String param1, String param2) {
+    public static ContactsFragment newInstance() {
         ContactsFragment fragment = new ContactsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public ContactsFragment() {
-    }
+    public ContactsFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-        // TODO: Change Adapter to display your content
-        mAdapter = new TestStableAdapter(
-                getActivity(),
-                //android.R.layout.simple_list_item_1,
+        String selection = ContactsContract.Contacts.DISPLAY_NAME + " <> \"\" ";
+        Cursor cursor = getActivity().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
+                new String[] { ContactsContract.Contacts._ID,
+                        ContactsContract.Contacts.DISPLAY_NAME},
+                selection,
+                null,
+                 "UPPER(" + ContactsContract.Contacts.DISPLAY_NAME + ") ASC");
+        mAdapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_list_item_multiple_choice,
-                //R.layout.contacts_fragment_header,
-                TestUtils.getTestList());
+                cursor,
+                new String[] { ContactsContract.Contacts.DISPLAY_NAME },
+                new int[] { android.R.id.text1 }, 0);
 
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item, container, false);
-        mHeaderView = inflater.inflate(R.layout.contacts_fragment_header, null);
+        //mHeaderView = inflater.inflate(R.layout.contacts_fragment_header, null);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -134,14 +99,55 @@ public class ContactsFragment extends ListFragment implements AbsListView.OnItem
         if (null != mListener) {
             Toast.makeText(getActivity().getApplicationContext(),
                     "Click ListItem Number " + position, Toast.LENGTH_SHORT)
-                    .show();        }
+                    .show();
+        }
+        updateHeader();
     }
 
-    /**
-     * The default content for this Fragment has a TextView that is shown when
-     * the list is empty. If you would like to change the text, call this method
-     * to supply the text it should use.
-     */
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        updateHeader();
+    }
+
+    private void updateHeader(){
+        if( mListView == null ) { return ; }
+        TextView items_count = (TextView) getActivity().findViewById(R.id.selected_items_count_view);
+        if( items_count  != null ){ items_count.setText(String.valueOf(getMyCheckedItems())); }
+    }
+
+    public void selection_make(SELECTION_ACTS selectionAct){
+        if( mListView == null ){ return; }
+        int len = mListView.getCount();
+        SparseBooleanArray checked = mListView.getCheckedItemPositions();
+        if( mListView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
+            for (int i = 0; i < len; i++) {
+                switch (selectionAct){
+                    case SELECTION_ALL:
+                        mListView.setItemChecked(i, true);
+                        break;
+                    case SELECTION_NONE:
+                        mListView.setItemChecked(i, false);
+                        break;
+                    case SELECTION_REVERSE:
+                        mListView.setItemChecked(i, !checked.get(i));
+                        break;
+                }
+            }
+        }
+        updateHeader();
+    }
+
+    //... get count of checked items in list
+    private int getMyCheckedItems(){
+        if( mListView == null ){ return(0); }
+        int len = mListView.getCount();
+        int result = 0 ;
+        SparseBooleanArray checked = mListView.getCheckedItemPositions();
+        for (int i = 0; i < len; i++) { if (checked.get(i)) { result++; } }
+        return(result);
+    }
+
     public void setEmptyText(CharSequence emptyText) {
         View emptyView = mListView.getEmptyView();
 
@@ -150,18 +156,7 @@ public class ContactsFragment extends ListFragment implements AbsListView.OnItem
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
 

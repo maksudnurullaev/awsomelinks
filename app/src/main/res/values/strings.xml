@@ -19,4 +19,7 @@
     <string name="file">Файл</string>
     <string name="Contacts">Contacts</string>
     <string name="Selected">Selected</string>
+    <string name="select_all">Select all</string>
+    <string name="select_none">Select none</string>
+    <string name="select_reverse">Reverse selection</string>
 </resources>

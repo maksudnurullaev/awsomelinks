@@ -19,4 +19,7 @@
     <string name="file">Файл</string>
     <string name="Contacts">Контакты</string>
     <string name="Selected">Выбрано</string>
+    <string name="select_all">Выбрать все</string>
+    <string name="select_none">Отменить всё</string>
+    <string name="select_reverse">Реверс выборки</string>
 </resources>

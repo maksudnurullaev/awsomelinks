@@ -6,10 +6,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import com.awsomelink.R;
+import android.widget.Toast;
 
 public class ContactsActivity extends ActionBarActivity implements ContactsFragment.OnFragmentInteractionListener {
+    private ContactsFragment contactsFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,9 +17,7 @@ public class ContactsActivity extends ActionBarActivity implements ContactsFragm
         setContentView(R.layout.contacts_activity);
         if (savedInstanceState == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            String arg1 = "Hello";
-            String arg2 = "World";
-            ContactsFragment contactsFragment = ContactsFragment.newInstance(arg1,arg2);
+            contactsFragment = ContactsFragment.newInstance();
             ft.add(R.id.contacts_activity_fragment_place, (Fragment)contactsFragment);
             ft.commit();
         }
@@ -29,7 +27,7 @@ public class ContactsActivity extends ActionBarActivity implements ContactsFragm
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_contacts_activity, menu);
+        getMenuInflater().inflate(R.menu.menu_contacts, menu);
         return true;
     }
 
@@ -40,11 +38,20 @@ public class ContactsActivity extends ActionBarActivity implements ContactsFragm
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()){
+            case (R.id.contacts_menu_select_all):
+                contactsFragment.selection_make(ContactsFragment.SELECTION_ACTS.SELECTION_ALL);
+                contactsFragment.selection_make(ContactsFragment.SELECTION_ACTS.SELECTION_ALL);
+                return(true);
+            case (R.id.contacts_menu_select_none):
+                contactsFragment.selection_make(ContactsFragment.SELECTION_ACTS.SELECTION_NONE);
+                return(true);
+            case (R.id.contacts_menu_select_reverse):
+                contactsFragment.selection_make(ContactsFragment.SELECTION_ACTS.SELECTION_REVERSE);
+                return(true);
+            default:
+                Toast.makeText(getApplicationContext(),"Unknown options clicked!",Toast.LENGTH_SHORT ).show();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
