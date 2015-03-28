@@ -2,6 +2,7 @@ package com.awsomelink.base;
 
 import android.app.ActionBar.LayoutParams;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
@@ -9,12 +10,15 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
+import android.provider.ContactsContract.Contacts;
 
 import com.awsomelink.R;
 
@@ -22,14 +26,27 @@ import com.awsomelink.R;
  * Created by m.nurullayev on 27.03.2015.
  */
 public abstract class ContactsFragmentBase0 extends ListFragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener {
 
     // This is the Adapter being used to display the list's data
     public SimpleCursorAdapter mAdapter;
+    // If non-null, this is th
+    private String mCurFilter;
+    private SearchView mSearchView;
+
+
 
     // These are the Contacts rows that we will retrieve
     // static final String[] PROJECTION = new String[] {ContactsContract.Data._ID, ContactsContract.Data.DISPLAY_NAME};
-    static final String[] PROJECTION = new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME };
+    // static final String[] PROJECTION = new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME };
+    static final String[] CONTACTS_SUMMARY_PROJECTION = new String[]{
+            Contacts._ID,
+            Contacts.DISPLAY_NAME,
+            Contacts.CONTACT_STATUS,
+            Contacts.CONTACT_PRESENCE,
+            Contacts.PHOTO_ID,
+            Contacts.LOOKUP_KEY,
+    };
 
     // This is the select criteria
 /*
@@ -91,10 +108,31 @@ public abstract class ContactsFragmentBase0 extends ListFragment
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mSearchView = (SearchView)getActivity().findViewById(R.id.searchView);
+        if( mSearchView != null ){ mSearchView.setOnQueryTextListener(this); }
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        mCurFilter = !TextUtils.isEmpty(newText) ? newText : null;
+        getLoaderManager().restartLoader(0, null, this);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return true;
+    }
+
     // Called when a new Loader needs to be created
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // Now create and return a CursorLoader that will take care of
         // creating a Cursor for the data being displayed.
+/*
         return new CursorLoader(getActivity(),
                 //ContactsContract.Data.CONTENT_URI,
                 ContactsContract.Contacts.CONTENT_URI,
@@ -102,6 +140,23 @@ public abstract class ContactsFragmentBase0 extends ListFragment
                 SELECTION,
                 null,
                 ORDER);
+*/
+        Uri baseUri;
+        if (mCurFilter != null) {
+            baseUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI,
+                    Uri.encode(mCurFilter));
+        } else {
+            baseUri = Contacts.CONTENT_URI;
+        }
+
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        String select = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
+                + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
+                + Contacts.DISPLAY_NAME + " != '' ))";
+        return new CursorLoader(getActivity(), baseUri,
+                CONTACTS_SUMMARY_PROJECTION, select, null,
+                Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC");
     }
 
     // Called when a previously created loader has finished loading

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.ListFragment;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,7 +67,7 @@ public class ContactsFragment extends ContactsFragmentBase0 implements AbsListVi
                              Bundle savedInstanceState) {
         //View view = inflater.inflate(R.layout.fragment_item, container, false);
         View view = inflater.inflate(R.layout.fragment_item, container, false);
-        //mHeaderView = inflater.inflate(R.layout.contacts_fragment_header, null);
+        //mHeaderView = inflater.inflate(R.layout.select_bar, null);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
