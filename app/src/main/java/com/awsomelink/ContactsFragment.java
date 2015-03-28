@@ -1,12 +1,7 @@
 package com.awsomelink;
 
 import android.app.Activity;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.v4.app.ListFragment;
-import android.text.TextUtils;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +9,8 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.awsomelink.base.ContactsFragmentBase0;
 
 /**
@@ -28,9 +22,8 @@ import com.awsomelink.base.ContactsFragmentBase0;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactsFragment extends ContactsFragmentBase0 implements AbsListView.OnItemClickListener { //} extends ListFragment implements AbsListView.OnItemClickListener {
+public class ContactsFragment extends ContactsFragmentBase0 { //} extends ListFragment implements AbsListView.OnItemClickListener {
     //... Used for mass selecting actions
-    public enum SELECTION_ACTS { SELECTION_ALL, SELECTION_NONE, SELECTION_REVERSE }
     private OnFragmentInteractionListener mListener;
     private AbsListView mListView;
     // private SimpleCursorAdapter mAdapter;
@@ -74,7 +67,7 @@ public class ContactsFragment extends ContactsFragmentBase0 implements AbsListVi
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+        // mListView.setOnItemClickListener(this);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         return view;
@@ -95,61 +88,6 @@ public class ContactsFragment extends ContactsFragmentBase0 implements AbsListVi
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "Click ListItem Number " + position, Toast.LENGTH_SHORT)
-                    .show();
-        }
-        updateHeader();
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        updateHeader();
-    }
-
-    private void updateHeader(){
-        if( mListView == null ) { return ; }
-        TextView items_count = (TextView) getActivity().findViewById(R.id.selected_items_count_view);
-        if( items_count  != null ){ items_count.setText(String.valueOf(getMyCheckedItems())); }
-    }
-
-    public void selection_make(SELECTION_ACTS selectionAct){
-        if( mListView == null ){ return; }
-        int len = mListView.getCount();
-        SparseBooleanArray checked = mListView.getCheckedItemPositions();
-        if( mListView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
-            for (int i = 0; i < len; i++) {
-                switch (selectionAct){
-                    case SELECTION_ALL:
-                        mListView.setItemChecked(i, true);
-                        break;
-                    case SELECTION_NONE:
-                        mListView.setItemChecked(i, false);
-                        break;
-                    case SELECTION_REVERSE:
-                        mListView.setItemChecked(i, !checked.get(i));
-                        break;
-                }
-            }
-        }
-        updateHeader();
-    }
-
-    //... get count of checked items in list
-    private int getMyCheckedItems(){
-        if( mListView == null ){ return(0); }
-        int len = mListView.getCount();
-        int result = 0 ;
-        SparseBooleanArray checked = mListView.getCheckedItemPositions();
-        for (int i = 0; i < len; i++) { if (checked.get(i)) { result++; } }
-        return(result);
     }
 
     public void setEmptyText(CharSequence emptyText) {

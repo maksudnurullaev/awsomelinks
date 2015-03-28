@@ -1,33 +1,33 @@
 package com.awsomelink.base;
 
-import android.app.ActionBar.LayoutParams;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.view.Gravity;
+import android.util.SparseBooleanArray;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
-import android.provider.ContactsContract.Contacts;
+import android.widget.TextView;
 
 import com.awsomelink.R;
 
 /**
  * Created by m.nurullayev on 27.03.2015.
  */
-public abstract class ContactsFragmentBase0 extends ListFragment
-        implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener {
+public class ContactsFragmentBase0 extends ListFragment
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+        SearchView.OnQueryTextListener {
 
+    public enum SELECTION_ACTS { SELECTION_ALL, SELECTION_NONE, SELECTION_REVERSE }
     // This is the Adapter being used to display the list's data
     public SimpleCursorAdapter mAdapter;
     // If non-null, this is th
@@ -47,6 +47,28 @@ public abstract class ContactsFragmentBase0 extends ListFragment
             Contacts.PHOTO_ID,
             Contacts.LOOKUP_KEY,
     };
+
+    public void selection_make(SELECTION_ACTS selectionAct){
+        if( getListView() == null ){ return; }
+        int len = getListView().getCount();
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        if( getListView().getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
+            for (int i = 0; i < len; i++) {
+                switch (selectionAct){
+                    case SELECTION_ALL:
+                        getListView().setItemChecked(i, true);
+                        break;
+                    case SELECTION_NONE:
+                        getListView().setItemChecked(i, false);
+                        break;
+                    case SELECTION_REVERSE:
+                        getListView().setItemChecked(i, !checked.get(i));
+                        break;
+                }
+            }
+        }
+        updateHeader();
+    }
 
     // This is the select criteria
 /*
@@ -178,6 +200,24 @@ public abstract class ContactsFragmentBase0 extends ListFragment
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // Do something when a list item is clicked
+        super.onListItemClick(l, v, position, id);
+        updateHeader();
     }
+
+    private void updateHeader(){
+        if( getListView() == null ) { return ; }
+        TextView items_count = (TextView) getActivity().findViewById(R.id.selected_items_count_view);
+        if( items_count  != null ){ items_count.setText(String.valueOf(getMyCheckedItems())); }
+    }
+
+    //... get count of checked items in list
+    private int getMyCheckedItems(){
+        if( getListView() == null ){ return(0); }
+        int len = getListView().getCount();
+        int result = 0 ;
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        for (int i = 0; i < len; i++) { if (checked.get(i)) { result++; } }
+        return(result);
+    }
+
 }
