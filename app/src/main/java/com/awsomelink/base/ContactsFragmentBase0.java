@@ -2,6 +2,7 @@ package com.awsomelink.base;
 
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
@@ -19,6 +20,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.awsomelink.R;
+import com.awsomelink.db.adapters.CustomCursorAdapter0;
 
 /**
  * Created by m.nurullayev on 27.03.2015.
@@ -29,7 +31,8 @@ public class ContactsFragmentBase0 extends ListFragment
 
     public enum SELECTION_ACTS { SELECTION_ALL, SELECTION_NONE, SELECTION_REVERSE }
     // This is the Adapter being used to display the list's data
-    public SimpleCursorAdapter mAdapter;
+    //public SimpleCursorAdapter mAdapter;
+    public CustomCursorAdapter0 mAdapter;
     // If non-null, this is th
     private String mCurFilter;
     private SearchView mSearchView;
@@ -41,7 +44,7 @@ public class ContactsFragmentBase0 extends ListFragment
     // static final String[] PROJECTION = new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME };
     static final String[] CONTACTS_SUMMARY_PROJECTION = new String[]{
             Contacts._ID,
-            Contacts.DISPLAY_NAME,
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? Contacts.DISPLAY_NAME_PRIMARY : Contacts.DISPLAY_NAME,
             Contacts.CONTACT_STATUS,
             Contacts.CONTACT_PRESENCE,
             Contacts.PHOTO_ID,
@@ -117,14 +120,18 @@ public class ContactsFragmentBase0 extends ListFragment
                 null,
                 "UPPER(" + ContactsContract.Contacts.DISPLAY_NAME + ") ASC");
 */
+        mAdapter = new CustomCursorAdapter0(getActivity().getApplicationContext(),null,0);
+/*
         mAdapter = new SimpleCursorAdapter(
                 getActivity(),
-                android.R.layout.simple_list_item_multiple_choice,
+                //android.R.layout.simple_list_item_multiple_choice,
+                R.layout.contacts_fragment_item,
                 null,
-                new String[] { ContactsContract.Contacts.DISPLAY_NAME },
-                new int[] { android.R.id.text1 }, 0);
-
-
+                new String[] { Contacts.DISPLAY_NAME, Contacts.LOOKUP_KEY  },
+                new int[] { R.id.firstLine, R.id.secondLine },
+                //new int[] { android.R.id.text1 },
+                0);
+*/
         // Prepare the loader.  Either re-connect with an existing one,
         // or start a new one.
         getLoaderManager().initLoader(0, null, this);
@@ -174,7 +181,7 @@ public class ContactsFragmentBase0 extends ListFragment
         // Now create and return a CursorLoader that will take care of
         // creating a Cursor for the data being displayed.
         String select = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
-                + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
+                + Contacts.HAS_PHONE_NUMBER + "='1') AND ("
                 + Contacts.DISPLAY_NAME + " != '' ))";
         return new CursorLoader(getActivity(), baseUri,
                 CONTACTS_SUMMARY_PROJECTION, select, null,
