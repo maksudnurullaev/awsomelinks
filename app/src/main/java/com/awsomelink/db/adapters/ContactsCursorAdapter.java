@@ -6,7 +6,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Data;
 import android.telephony.PhoneNumberUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,19 +13,21 @@ import android.widget.CheckedTextView;
 import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import com.awsomelink.R;
+import com.awsomelink.base.Contact;
+
 import java.util.HashMap;
 import java.util.Locale;
 
 /**
  * Created by m.nurullayev on 30.03.2015.
  */
-public class CustomCursorAdapter0 extends CursorAdapter {
+public class ContactsCursorAdapter extends CursorAdapter {
     private LayoutInflater mLayoutInflater;
-    private static final String TAG = "CustomCursorAdapter0";
-    private static HashMap<String,HashMap<String,Boolean>> mDataHash = new HashMap<>();
+    private static final String TAG = "ContactsCursorAdapter";
+    private static HashMap<String,Contact> mDataHash = new HashMap<>();
     private Context mContext ;
 
-    public CustomCursorAdapter0(Context context, Cursor c, int flags) {
+    public ContactsCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         mContext = context;
         mLayoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -41,7 +42,9 @@ public class CustomCursorAdapter0 extends CursorAdapter {
         if( ll != null ){
             ll.removeAllViews();
             String lookUpKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
-            HashMap<String, Boolean> phones = getHashData4(displayName,lookUpKey);
+            String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            Contact contact = getContact(id,lookUpKey,displayName);
+            HashMap<String,Boolean> phones = contact.get_phones();
             for(String key: phones.keySet()){
                 CheckedTextView phone = (CheckedTextView) mLayoutInflater.inflate(R.layout.contacts_item_row_level2,null);
                 phone.setText(key);
@@ -50,29 +53,29 @@ public class CustomCursorAdapter0 extends CursorAdapter {
         }
     }
 
-    public HashMap<String,Boolean> getHashData4(String displayName, String lookUpKey){
+    public Contact getContact(String id, String lookUpKey, String displayName){
         if( mDataHash.containsKey(displayName) ){
             return(mDataHash.get(displayName));
         }
         Cursor pCur = mContext.getContentResolver().query(ContactsContract.Data.CONTENT_URI,
-                new String[] {Data._ID, Phone.NUMBER, Phone.TYPE, Phone.LABEL},
+                new String[] {Data.CONTACT_ID, Phone.NUMBER, Phone.TYPE, Phone.LABEL},
                 Data.LOOKUP_KEY + "=?" + " AND "
                         + Data.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'",
                 new String[] {lookUpKey}, null);
         int test = 0;
-        HashMap<String, Boolean> phones = new HashMap<>();
+        //HashMap<String, Boolean> phones = new HashMap<>();
+        Contact contact = new Contact(id,lookUpKey,displayName);
+        String contactNumber ;
         while (pCur.moveToNext())
         {
-            String contactNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            if( !phones.containsKey(contactNumber) ) {
+            contactNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            if( !contact.get_phones().containsKey(contactNumber) ) {
                 contactNumber = PhoneNumberUtils.formatNumber(contactNumber, Locale.getDefault().getCountry());
-                phones.put(contactNumber, Boolean.FALSE);
-                Log.d(TAG, "Contact " + String.valueOf(test++) + ": " + displayName + ", " + contactNumber);
+                contact.get_phones().put(contactNumber, Boolean.FALSE);
             }
         }
-        pCur.close();
-        mDataHash.put(displayName, phones);
-        return(phones);
+        mDataHash.put(displayName,contact);
+        return(contact);
     }
 
     @Override
