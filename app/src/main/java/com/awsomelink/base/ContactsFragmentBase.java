@@ -13,10 +13,15 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.awsomelink.R;
 import com.awsomelink.db.adapters.ContactsCursorAdapter;
@@ -26,18 +31,15 @@ import com.awsomelink.db.adapters.ContactsCursorAdapter;
  */
 public class ContactsFragmentBase extends ListFragment
         implements LoaderManager.LoaderCallbacks<Cursor>,
-        SearchView.OnQueryTextListener {
+        SearchView.OnQueryTextListener, View.OnClickListener {
 
+    private ListView mListView;
     public enum SELECTION_ACTS { SELECTION_ALL, SELECTION_NONE, SELECTION_REVERSE }
-    // This is the Adapter being used to display the list's data
-    //public SimpleCursorAdapter mAdapter;
+    public enum SELECTION_TYPE { TITLE, PHONE }
     public ContactsCursorAdapter mAdapter;
-    // If non-null, this is th
     private String mCurFilter;
     private SearchView mSearchView;
     private static final String TAG = "ContactsFragmentBase";
-
-
 
     // These are the Contacts rows that we will retrieve
     static final String[] CONTACTS_SUMMARY_PROJECTION = new String[]{
@@ -71,8 +73,24 @@ public class ContactsFragmentBase extends ListFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mAdapter = new ContactsCursorAdapter(getActivity().getApplicationContext(),null,0);
+        mAdapter = new ContactsCursorAdapter(getActivity().getApplicationContext(),null,0,(ListFragment)this);
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_item, container, false);
+
+        // Set the adapter
+        mListView = (ListView) view.findViewById(android.R.id.list);
+        mListView.setAdapter(mAdapter);
+
+        // Set OnItemClickListener so we can be notified on item clicks
+        //mListView.setOnItemClickListener(this);
+        //mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        return view;
     }
 
     @Override
@@ -141,10 +159,31 @@ public class ContactsFragmentBase extends ListFragment
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        updateHeader();
+    public void onClick(View v) {
+        if( v instanceof CheckedTextView && v.getTag() instanceof SELECTION_TYPE ){
+            CheckedTextView c = (CheckedTextView)v;
+            boolean newSelectionValue = c.isChecked() ? false : true;
+            c.setChecked(newSelectionValue);
+            SELECTION_TYPE selectionType = (SELECTION_TYPE)v.getTag();
+            switch (selectionType) {
+                case TITLE:
+                    String title = c.getText().toString();
+                    mAdapter.setTitleChecked(title,newSelectionValue);
+                    break;
+                case PHONE:
+                    break;
+                default:
+                    Log.e(TAG, "Undefined & unhandled SELECTION_TYPE: " + v.getTag());
+                    Toast.makeText(
+                            getActivity().getApplicationContext(),
+                            ("Undefined & unhandled SELECTION_TYPE: " + v.getTag()),
+                            Toast.LENGTH_SHORT).show();
+            }
+        }
+        Toast.makeText(getActivity().getApplicationContext(), ("Checked position3! " + v.getTag()), Toast.LENGTH_SHORT).show();
     }
+
+
 
     private void updateHeader(){
         if( getListView() == null ) { return ; }

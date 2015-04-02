@@ -19,6 +19,7 @@ public class Contact {
         this._id = id;
         this._lookup_key = lookup_key;
         this._display_name = display_name;
+        this._checked = Boolean.FALSE;
     }
 
     public String get_id() {

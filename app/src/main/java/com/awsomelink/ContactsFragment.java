@@ -17,8 +17,6 @@ import com.awsomelink.base.ContactsFragmentBase;
 public class ContactsFragment extends ContactsFragmentBase { //} extends ListFragment implements AbsListView.OnItemClickListener {
     //... Used for mass selecting actions
     private OnFragmentInteractionListener mListener;
-    //private AbsListView mListView;
-    private ListView mListView;
 
     public static ContactsFragment newInstance() {
         ContactsFragment fragment = new ContactsFragment();
@@ -26,22 +24,6 @@ public class ContactsFragment extends ContactsFragmentBase { //} extends ListFra
     }
 
     public ContactsFragment() { }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item, container, false);
-
-        // Set the adapter
-        mListView = (ListView) view.findViewById(android.R.id.list);
-        mListView.setAdapter(mAdapter);
-
-        // Set OnItemClickListener so we can be notified on item clicks
-        //TODO mListView.setOnItemClickListener(this);
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-        return view;
-    }
 
     @Override
     public void onAttach(Activity activity) {
