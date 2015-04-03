@@ -61,17 +61,13 @@ public class ContactsCursorAdapter extends CursorAdapter {
             String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             Contact contact = getContact(id,lookUpKey,displayName);
             HashMap<String,Boolean> phones = contact.get_phones();
-            for(String key: phones.keySet()){
+            for(String phoneNumber: phones.keySet()){
                 CheckedTextView phone = (CheckedTextView) mLayoutInflater.inflate(R.layout.contacts_item_row_level2,null);
-                phone.setText(key);
+                phone.setText(phoneNumber);
+                phone.setChecked(contact.get_phones().get(phoneNumber).booleanValue());
                 phone.setOnClickListener((View.OnClickListener)mListFragment);
                 phone.setTag(ContactsFragmentBase.SELECTION_TYPE.PHONE);
-                if( mContactsMap.containsKey(displayName) ) {
-//                    HashMap<String,Boolean> phones = contact.get_phones();
-                    for(String keyPhone:phones.keySet()){
-                        phone.setChecked(phones.get(keyPhone).booleanValue());
-                    }
-                }
+                phone.setTag(R.id.contact_phone_tag_display_name,displayName);
                 ll.addView(phone);
             }
         }
@@ -94,10 +90,12 @@ public class ContactsCursorAdapter extends CursorAdapter {
         {
             contactNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             if( !contact.get_phones().containsKey(contactNumber) ) {
-                contactNumber = PhoneNumberUtils.formatNumber(contactNumber, Locale.getDefault().getCountry());
+                String countryIso = Locale.getDefault().getCountry();
+                contactNumber = PhoneNumberUtils.formatNumber(contactNumber, countryIso);
                 contact.get_phones().put(contactNumber, Boolean.FALSE);
             }
         }
+        pCur.close();
         mContactsMap.put(displayName, contact);
         return(contact);
     }
@@ -107,14 +105,46 @@ public class ContactsCursorAdapter extends CursorAdapter {
         return mLayoutInflater.inflate(R.layout.contacts_item_row,parent,false);
     }
 
-    public void setTitleChecked(String key, boolean value){
-        if( mContactsMap.containsKey(key) ){
-            Contact contact = mContactsMap.get(key);
+    public void setTitleChecked(String displayName, boolean value, boolean includeChilds){
+        if( mContactsMap.containsKey(displayName) ){
+            Contact contact = mContactsMap.get(displayName);
             contact.set_checked(value);
+            if( !includeChilds ) return ;
+
             HashMap<String,Boolean> phones = contact.get_phones();
             for(String phone:phones.keySet()){
-                phones.put(phone,value);
+                phones.put(phone, value);
             }
         }
     }
+
+    public void setPhoneChecked(String displayName, String phoneNumber, boolean value){
+        if( mContactsMap.containsKey(displayName) ){
+            Contact contact = mContactsMap.get(displayName);
+            if( contact.get_phones().containsKey(phoneNumber) ){
+                contact.get_phones().put(phoneNumber, value);
+            }
+        }
+    }
+
+    public int getCheckedContactsCount(){
+        int result = 0;
+        for(String displayName:mContactsMap.keySet()){
+            if(mContactsMap.get(displayName).get_checked()) result++;
+        }
+        return(result);
+    }
+
+    public void checkAllAs(boolean value){
+        for(String displayName:mContactsMap.keySet()) {
+            setTitleChecked(displayName,value,true);
+        }
+    }
+
+    public void checkAllReverse(){
+        for(String displayName:mContactsMap.keySet()) {
+            setTitleChecked(displayName,!mContactsMap.get(displayName).get_checked(), true);
+        }
+    }
+
 }

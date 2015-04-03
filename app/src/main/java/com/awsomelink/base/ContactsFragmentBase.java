@@ -12,13 +12,13 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.CheckedTextView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,23 +50,18 @@ public class ContactsFragmentBase extends ListFragment
 
     public void selection_make(SELECTION_ACTS selectionAct){
         if( getListView() == null ){ return; }
-        int len = getListView().getCount();
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        if( getListView().getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
-            for (int i = 0; i < len; i++) {
-                switch (selectionAct){
-                    case SELECTION_ALL:
-                        getListView().setItemChecked(i, true);
-                        break;
-                    case SELECTION_NONE:
-                        getListView().setItemChecked(i, false);
-                        break;
-                    case SELECTION_REVERSE:
-                        getListView().setItemChecked(i, !checked.get(i));
-                        break;
-                }
-            }
+        switch (selectionAct) {
+            case SELECTION_ALL:
+                mAdapter.checkAllAs(true);
+                break;
+            case SELECTION_NONE:
+                mAdapter.checkAllAs(false);
+                break;
+            case SELECTION_REVERSE:
+                mAdapter.checkAllReverse();
+                break;
         }
+        getListView().invalidateViews();
         updateHeader();
     }
 
@@ -165,12 +160,16 @@ public class ContactsFragmentBase extends ListFragment
             boolean newSelectionValue = c.isChecked() ? false : true;
             c.setChecked(newSelectionValue);
             SELECTION_TYPE selectionType = (SELECTION_TYPE)v.getTag();
+            String displayName;
             switch (selectionType) {
                 case TITLE:
-                    String title = c.getText().toString();
-                    mAdapter.setTitleChecked(title,newSelectionValue);
+                    displayName = c.getText().toString();
+                    setTitleChecked(c, displayName, newSelectionValue);
                     break;
                 case PHONE:
+                    String phoneNumber = c.getText().toString();
+                    displayName = (String)c.getTag(R.id.contact_phone_tag_display_name);
+                    setPhoneChecked(c, displayName, phoneNumber, newSelectionValue);
                     break;
                 default:
                     Log.e(TAG, "Undefined & unhandled SELECTION_TYPE: " + v.getTag());
@@ -180,25 +179,51 @@ public class ContactsFragmentBase extends ListFragment
                             Toast.LENGTH_SHORT).show();
             }
         }
-        Toast.makeText(getActivity().getApplicationContext(), ("Checked position3! " + v.getTag()), Toast.LENGTH_SHORT).show();
     }
 
+    private void setTitleChecked(CheckedTextView c, String titleString, boolean value){
+        mAdapter.setTitleChecked(titleString,value,true);
+        if(c.getParent() instanceof RelativeLayout){
+            RelativeLayout rl = (RelativeLayout)c.getParent();
+            if( rl.findViewById(R.id.list_row_content) != null
+                    && rl.findViewById(R.id.list_row_content) instanceof LinearLayout){
+                LinearLayout ll = (LinearLayout)rl.findViewById(R.id.list_row_content);
+                if( ll.getChildCount() > 0 ){
+                    for(int i = 0; i < ll.getChildCount(); i++){
+                        if( ll.getChildAt(i) instanceof CheckedTextView){
+                            ((CheckedTextView)ll.getChildAt(i)).setChecked(value);
+                        }
+                    }
+                }
+            };
+        }
+        updateHeader();
+    };
 
+    private void setPhoneChecked(CheckedTextView c, String displayName, String phoneNumber, boolean newSelectionValue){
+        mAdapter.setPhoneChecked(displayName, phoneNumber,newSelectionValue);
+        LinearLayout ll = (LinearLayout) c.getParent();
+        boolean anyCheckedPhone = false;
+        for(int i = 0; i < ll.getChildCount(); i++){
+            if( ll.getChildAt(i) instanceof CheckedTextView){
+                if( ((CheckedTextView)ll.getChildAt(i)).isChecked() ) {
+                    anyCheckedPhone = true;
+                    break;
+                }
+            }
+        }
+        if( ll.getParent() instanceof RelativeLayout){
+            RelativeLayout rl = (RelativeLayout) ll.getParent();
+            CheckedTextView parentCheck = (CheckedTextView) rl.findViewById(R.id.cb_title);
+            parentCheck.setChecked(anyCheckedPhone);
+            mAdapter.setTitleChecked(displayName,anyCheckedPhone,false);
+        }
+        updateHeader();
+    }
 
     private void updateHeader(){
         if( getListView() == null ) { return ; }
         TextView items_count = (TextView) getActivity().findViewById(R.id.selected_items_count_view);
-        if( items_count  != null ){ items_count.setText(String.valueOf(getMyCheckedItems())); }
+        if( items_count  != null ){ items_count.setText(String.valueOf(mAdapter.getCheckedContactsCount())); }
     }
-
-    //... get count of checked items in list
-    private int getMyCheckedItems(){
-        if( getListView() == null ){ return(0); }
-        int len = getListView().getCount();
-        int result = 0 ;
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        for (int i = 0; i < len; i++) { if (checked.get(i)) { result++; } }
-        return(result);
-    }
-
 }
