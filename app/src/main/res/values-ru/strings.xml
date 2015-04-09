@@ -22,5 +22,5 @@
     <string name="select_all">Выбрать все</string>
     <string name="select_none">Отменить всё</string>
     <string name="select_reverse">Реверс выборки</string>
-    <string name="loading">Загрузка...</string>
+    <string name="loading">Загрузка…</string>
 </resources>

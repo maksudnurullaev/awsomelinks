@@ -4,12 +4,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 public class ContactsActivity extends ActionBarActivity implements ContactsFragment.OnFragmentInteractionListener {
+    private static final String TAG = "ContactsActivity";
     private ContactsFragment contactsFragment = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +36,14 @@ public class ContactsActivity extends ActionBarActivity implements ContactsFragm
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        if( contactsFragment == null ){
+            Log.e(TAG, "ContactFragment is null!");
+            return super.onOptionsItemSelected(item);
+        }
 
+        int id = item.getItemId();
         switch (item.getItemId()){
             case (R.id.contacts_menu_select_all):
-                contactsFragment.selection_make(ContactsFragment.SELECTION_ACTS.SELECTION_ALL);
                 contactsFragment.selection_make(ContactsFragment.SELECTION_ACTS.SELECTION_ALL);
                 return(true);
             case (R.id.contacts_menu_select_none):

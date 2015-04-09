@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,11 +16,16 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.awsomelink.db.wildsql.WildSQLBase;
+
+import java.util.HashMap;
+
 /**
  * Created by m.nurullayev on 03.03.2015.
  */
 
 public class OutboxFragment extends Fragment implements MainActivity.ContentFragment {
+    public static final String TAG = "OutboxFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -43,17 +49,39 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 addLinkAddresses();
                 break;
             default:
+                WildSQLBase dbase = new WildSQLBase(getActivity().getApplicationContext());
+
+                HashMap<String,String> dbobject = new HashMap<>();
+                dbobject.put(WildSQLBase.OBJECT_NAME_VALUE, "test object");
+                for(int i=1;i<10;i++){
+                    dbobject.put("test field " + i, "test value " + i);
+                }
+                //String dbobject_id = dbase.insert(dbobject);
+
+                HashMap<String,HashMap<String,String>> dbojects = dbase.get_all_dbobjects();
+                if( dbojects != null ) {
+                    Log.d(TAG, "Total dbobjects count: " + dbojects.keySet().size());
+                    for (String key1 : dbojects.keySet()) {
+                        dbobject = dbojects.get(key1);
+                        Log.d(TAG, "DBOBJECT ID: " + key1);
+                        for (String key2 : dbobject.keySet()) {
+                            Log.d(TAG, " .... " + key2 + " --> " + dbobject.get(key2));
+                        }
+                    }
+                }
+                /*
+                HashMap<String,String> dbobject = new HashMap<>();
+                dbobject.put(WildSQLBase.OBJECT_NAME_VALUE, "test object");
+                for(int i=1;i<10;i++){
+                    dbobject.put("test field " + i, "test value " + i);
+                }
+                String dbobject_id = dbase.insert(dbobject);
+                */
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown click id: " + id, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void addLinkAddresses(){
-        //getActivity().getContentResolver()
-        //Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        //super.startActivityForResult(i, 1001);
-        ///Intent intent = new Intent(Intent.ACTION_PICK);
-        ///intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
-        ///startActivityForResult(intent, 1001);
         Intent i = new Intent(getActivity(),ContactsActivity.class);
         startActivity(i);
     }

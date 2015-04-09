@@ -32,14 +32,13 @@ import com.awsomelink.db.adapters.ContactsCursorAdapter;
 public class ContactsFragmentBase extends ListFragment
         implements LoaderManager.LoaderCallbacks<Cursor>,
         SearchView.OnQueryTextListener, View.OnClickListener {
-
+    private static final String TAG = "ContactsFragmentBase";
     private ListView mListView;
     public enum SELECTION_ACTS { SELECTION_ALL, SELECTION_NONE, SELECTION_REVERSE }
     public enum SELECTION_TYPE { TITLE, PHONE }
     public ContactsCursorAdapter mAdapter;
     private String mCurFilter;
     private SearchView mSearchView;
-    private static final String TAG = "ContactsFragmentBase";
 
     // These are the Contacts rows that we will retrieve
     static final String[] CONTACTS_SUMMARY_PROJECTION = new String[]{

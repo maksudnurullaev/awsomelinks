@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.awsomelink.base.ContactsFragmentBase;
 
 
-public class ContactsFragment extends ContactsFragmentBase { //} extends ListFragment implements AbsListView.OnItemClickListener {
+public class ContactsFragment extends ContactsFragmentBase {
     //... Used for mass selecting actions
     private OnFragmentInteractionListener mListener;
 

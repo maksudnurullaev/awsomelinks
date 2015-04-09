@@ -25,8 +25,8 @@ import java.util.Locale;
  * Created by m.nurullayev on 30.03.2015.
  */
 public class ContactsCursorAdapter extends CursorAdapter {
-    private LayoutInflater mLayoutInflater;
     private static final String TAG = "ContactsCursorAdapter";
+    private LayoutInflater mLayoutInflater;
     private static HashMap<String,Contact> mContactsMap = new HashMap<>();
     private Context mContext ;
     private ListFragment mListFragment;
@@ -51,9 +51,8 @@ public class ContactsCursorAdapter extends CursorAdapter {
         title.setText(displayName);
         if( mContactsMap.containsKey(displayName) ) {
             title.setChecked(mContactsMap.get(displayName).get_checked());
-        } //else {
-          //  title.setChecked(false);
-        //}
+        }
+
         LinearLayout ll = (LinearLayout) view.findViewById(R.id.list_row_content);
         if( ll != null ){
             ll.removeAllViews();
@@ -90,8 +89,8 @@ public class ContactsCursorAdapter extends CursorAdapter {
         {
             contactNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             if( !contact.get_phones().containsKey(contactNumber) ) {
-                String countryIso = Locale.getDefault().getCountry();
-                contactNumber = PhoneNumberUtils.formatNumber(contactNumber, countryIso);
+//                String countryIso = Locale.getDefault().getCountry();
+//                contactNumber = PhoneNumberUtils.formatNumber(contactNumber, countryIso);
                 contact.get_phones().put(contactNumber, Boolean.FALSE);
             }
         }
