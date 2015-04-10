@@ -92,6 +92,7 @@ public class ContactsFragmentBase extends ListFragment
         super.onViewCreated(view, savedInstanceState);
         mSearchView = (SearchView)getActivity().findViewById(R.id.searchView);
         if( mSearchView != null ){ mSearchView.setOnQueryTextListener(this); }
+        updateHeader();
     }
 
     @Override

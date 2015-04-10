@@ -17,6 +17,7 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.awsomelink.db.wildsql.WildSQLBase;
+import com.awsomelink.db.wildsql.WildSQLUtils;
 
 import java.util.HashMap;
 
@@ -48,35 +49,13 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 //Toast.makeText(getActivity().getApplicationContext(),"Add address clicked!",Toast.LENGTH_SHORT).show();
                 addLinkAddresses();
                 break;
+            case (R.id.action_file):
+                WildSQLUtils.test_1(getActivity().getApplicationContext());
+                WildSQLUtils.test_2(getActivity().getApplicationContext());
+                WildSQLUtils.test_3(getActivity().getApplicationContext());
+                WildSQLUtils.test_4(getActivity().getApplicationContext());
+                break;
             default:
-                WildSQLBase dbase = new WildSQLBase(getActivity().getApplicationContext());
-
-                HashMap<String,String> dbobject = new HashMap<>();
-                dbobject.put(WildSQLBase.OBJECT_NAME_VALUE, "test object");
-                for(int i=1;i<10;i++){
-                    dbobject.put("test field " + i, "test value " + i);
-                }
-                //String dbobject_id = dbase.insert(dbobject);
-
-                HashMap<String,HashMap<String,String>> dbojects = dbase.get_all_dbobjects();
-                if( dbojects != null ) {
-                    Log.d(TAG, "Total dbobjects count: " + dbojects.keySet().size());
-                    for (String key1 : dbojects.keySet()) {
-                        dbobject = dbojects.get(key1);
-                        Log.d(TAG, "DBOBJECT ID: " + key1);
-                        for (String key2 : dbobject.keySet()) {
-                            Log.d(TAG, " .... " + key2 + " --> " + dbobject.get(key2));
-                        }
-                    }
-                }
-                /*
-                HashMap<String,String> dbobject = new HashMap<>();
-                dbobject.put(WildSQLBase.OBJECT_NAME_VALUE, "test object");
-                for(int i=1;i<10;i++){
-                    dbobject.put("test field " + i, "test value " + i);
-                }
-                String dbobject_id = dbase.insert(dbobject);
-                */
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown click id: " + id, Toast.LENGTH_SHORT).show();
         }
     }

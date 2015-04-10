@@ -23,4 +23,5 @@
     <string name="select_none">Select none</string>
     <string name="select_reverse">Reverse selection</string>
     <string name="loading">Loading…</string>
+    <string name="Make_link">Make link</string>
 </resources>

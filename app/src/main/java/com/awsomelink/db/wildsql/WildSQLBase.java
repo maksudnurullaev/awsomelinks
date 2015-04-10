@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
@@ -50,8 +51,9 @@ public class WildSQLBase extends SQLiteOpenHelper {
 
     @Override
     public void onConfigure(SQLiteDatabase db) {
-        db.execSQL("PRAGMA synchronous = OFF; DROP TABLE objects;");
+        db.execSQL("PRAGMA synchronous = OFF;");
     }
+
 
     public static String get_new_id(){
         return(dformat.format(new Date()) + ' ' + UUID.randomUUID().toString().substring(0, 8));
@@ -97,6 +99,17 @@ public class WildSQLBase extends SQLiteOpenHelper {
         for(String key: keys){ dbobject.remove(key); }
     }
 
+    public HashMap<String,HashMap<String,String>> get_dbobjects(String... ids){
+        if(ids == null || ids.length == 0){
+            Log.e(TAG, "Invalid id for deletion!");
+            return(null);
+        }
+        SQLiteDatabase db = getReadableDatabase();
+        String where_part = WildSQLUtils.make_where_in_part(COLUMN_ID,ids.length);
+        Cursor cursor = db.query(TABLE_NAME,ALL_COLUMNS,where_part,ids,null,null,null);
+        return(generate_dbobjects(cursor));
+    }
+
     public HashMap<String,HashMap<String,String>> get_all_dbobjects(){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME,ALL_COLUMNS,null,null,null,null,null);
@@ -124,4 +137,15 @@ public class WildSQLBase extends SQLiteOpenHelper {
         }while(cursor.moveToNext());
         return(dbobjects);
     }
+
+    public void delete_dbobjects(String... ids){
+        if(ids == null || ids.length == 0){
+            Log.e(TAG, "Invalid id for deletion!");
+            return;
+        }
+        SQLiteDatabase db = getReadableDatabase();
+        String where_part = WildSQLUtils.make_where_in_part(COLUMN_ID,ids.length);
+        db.delete(TABLE_NAME,where_part,ids);
+    }
+
 }
