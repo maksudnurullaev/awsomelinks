@@ -20,7 +20,7 @@ public class WildSQLUtils {
         test_add_dbobjects(context, "test objects 1", 4, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
-        HashMap<String, HashMap<String, String>> dbobjects = dbase.get_all_dbobjects();
+        HashMap<String, HashMap<String, String>> dbobjects = get_all_test_dbobjects(dbase);
         // log all dbobjects
         // test_log_objects(dbobjects);
         my_assert(dbobjects.size() == 4, "Test #1, create some dbobjects!");
@@ -34,7 +34,7 @@ public class WildSQLUtils {
         test_add_dbobjects(context, "test objects 1", 4, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
-        HashMap<String, HashMap<String, String>> dbobjects = dbase.get_all_dbobjects();
+        HashMap<String, HashMap<String, String>> dbobjects = get_all_test_dbobjects(dbase);
         // log all dbobjects
         my_assert(dbobjects.size() == 4, "Test #2, create some dbobjects!");
         // delete all test objects
@@ -54,7 +54,7 @@ public class WildSQLUtils {
         test_add_dbobjects(context, "test objects 1", 14, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
-        HashMap<String, HashMap<String, String>> dbobjects = dbase.get_all_dbobjects();
+        HashMap<String, HashMap<String, String>> dbobjects = get_all_test_dbobjects(dbase);
         // log all dbobjects
         my_assert(dbobjects.size() == 14, "Test #3, create some dbobjects!");
         // delete all test objects
@@ -72,13 +72,43 @@ public class WildSQLUtils {
         test_add_dbobjects(context, "test objects 1", 14, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
-        HashMap<String, HashMap<String, String>> dbobjects = dbase.get_all_dbobjects();
+        HashMap<String, HashMap<String, String>> dbobjects = get_all_test_dbobjects(dbase);
         // log all dbobjects
         my_assert(dbobjects.size() == 14, "Test #4, create some dbobjects!");
         String[] ids = dbobjects.keySet().toArray(new String[dbobjects.keySet().size()]);
         String firstId = ids[0], lastId = ids[ids.length-1];
         dbobjects = dbase.get_dbobjects(firstId,lastId);
         my_assert(dbobjects.containsKey(firstId) && dbobjects.containsKey(lastId),"Test #4, test existance of dbobjects!");
+    }
+
+    // ... simple add + update
+    public static void test_5(Context context) {
+        // clear test dbobjects from database
+        clear_test_dbobjects(context);
+        // add some tet objects
+        test_add_dbobjects(context, "test objects 1", 1, 5);
+        // get all objects from database
+        WildSQLBase dbase = new WildSQLBase(context);
+        HashMap<String, HashMap<String, String>> dbobjects = dbase.get_all_dbobjects();
+        my_assert(dbobjects.size() == 1, "Test #5, create test dbobjects!");
+        String[] ids = dbobjects.keySet().toArray(new String[dbobjects.keySet().size()]);
+        String firstId = ids[0], lastId = ids[ids.length-1];
+        dbobjects = dbase.get_dbobjects(firstId,lastId);
+        my_assert(dbobjects.containsKey(firstId) && dbobjects.containsKey(lastId),"Test #4, test existance of dbobjects!");
+        // ... update field
+        HashMap<String, String> firstObject = dbobjects.get(firstId);
+        my_assert(firstObject.containsKey(WildSQLBase.COLUMN_ID) && firstObject.containsKey(WildSQLBase.OBJECT_NAME_VALUE),
+                "Test #4, test neccessary field existance!");
+        firstObject.put("new key 1", "new value 1"); // new field
+        firstObject.put("test field 1", "new test value 1"); // update field
+        dbase.update(firstObject);
+        dbobjects = dbase.get_dbobjects(firstId);
+        my_assert(dbobjects.containsKey(firstId), "Test #4, Check existance of updated dbobject!");
+        if( dbobjects.containsKey(firstId) ) {
+            firstObject = dbobjects.get(firstId);
+            my_assert(firstObject.get("new key 1").equals("new value 1"), "Test #4, Check for new field of updated dbobject!");
+            my_assert(firstObject.get("test field 1").equals("new test value 1"), "Test #4, Check for updated field of updated dbobject!");
+        }
     }
 
     /* ===  UTILITIES ==== */
@@ -125,7 +155,6 @@ public class WildSQLUtils {
         db.delete(WildSQLBase.TABLE_NAME, " name like 'test%'", null);
     }
 
-
     public static String make_where_in_part(String field_name, int field_count){
         String where_part = field_name + " IN (";
         for(int i=0; i<field_count; i++){
@@ -134,5 +163,9 @@ public class WildSQLUtils {
         }
         where_part += ')';
         return(where_part);
+    }
+
+    public static HashMap<String, HashMap<String, String>> get_all_test_dbobjects(WildSQLBase dbase){
+        return( dbase.get_all_dbobjects(WildSQLBase.COLUMN_NAME + " like 'test%'", null) );
     }
 }

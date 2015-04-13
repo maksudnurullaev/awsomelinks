@@ -54,66 +54,9 @@ public class WildSQLBase extends SQLiteOpenHelper {
         db.execSQL("PRAGMA synchronous = OFF;");
     }
 
-
+    /* === UTILITIES === */
     public static String get_new_id(){
         return(dformat.format(new Date()) + ' ' + UUID.randomUUID().toString().substring(0, 8));
-    }
-
-    public String insert(HashMap<String,String> dbobject){
-        if(!validate_dbobject(dbobject)){ return(null); }
-        String id = get_new_id();
-        String object_name = dbobject.get(OBJECT_NAME_VALUE);
-        trip_dbobject(dbobject,OBJECT_NAME_VALUE,"id");
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values ;
-        for(String key:dbobject.keySet()){
-            values = new ContentValues();
-            values.put(COLUMN_ID,id);
-            values.put(COLUMN_NAME,object_name);
-            values.put(COLUMN_FIELD, key);
-            values.put(COLUMN_VALUE, dbobject.get(key));
-            long _id = db.insert(TABLE_NAME, null,values);
-            Log.d(TAG,"Record inserted with id: " + _id);
-        }
-        return(id);
-    }
-
-    public static boolean validate_dbobject(HashMap<String,String> dbobject){
-        if(dbobject == null){
-            Log.e(TAG,"Invalid dbobject: NULL dbobject!");
-            return(false);
-        }
-        if(!dbobject.containsKey(OBJECT_NAME_VALUE)){
-            Log.e(TAG,"Invalid dbobject: Abcense of mandatory '" + OBJECT_NAME_VALUE + "' field!");
-            return(false);
-        }
-        if(dbobject.keySet().size() < 1){
-            Log.e(TAG,"Invalid dbobject: No data!");
-            return(false);
-        }
-        return(true);
-    }
-
-    public static void trip_dbobject(HashMap<String,String> dbobject, String... keys){
-        if(dbobject == null){ return; };
-        for(String key: keys){ dbobject.remove(key); }
-    }
-
-    public HashMap<String,HashMap<String,String>> get_dbobjects(String... ids){
-        if(ids == null || ids.length == 0){
-            Log.e(TAG, "Invalid id for deletion!");
-            return(null);
-        }
-        SQLiteDatabase db = getReadableDatabase();
-        String where_part = WildSQLUtils.make_where_in_part(COLUMN_ID,ids.length);
-        Cursor cursor = db.query(TABLE_NAME,ALL_COLUMNS,where_part,ids,null,null,null);
-        return(generate_dbobjects(cursor));
-    }
-
-    public HashMap<String,HashMap<String,String>> get_all_dbobjects(){
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME,ALL_COLUMNS,null,null,null,null,null);
-        return(generate_dbobjects(cursor));
     }
 
     private static HashMap<String,HashMap<String,String>> generate_dbobjects(Cursor cursor){
@@ -136,6 +79,119 @@ public class WildSQLBase extends SQLiteOpenHelper {
                     cursor.getString(cursor.getColumnIndex(COLUMN_VALUE)));
         }while(cursor.moveToNext());
         return(dbobjects);
+    }
+
+    public static boolean validate2insert(HashMap<String, String> dbobject){
+        if(dbobject == null){
+            Log.e(TAG,"Invalid dbobject: NULL dbobject!");
+            return(false);
+        }
+        if(!dbobject.containsKey(OBJECT_NAME_VALUE)){
+            Log.e(TAG,"Invalid dbobject: Abcense of mandatory '" + OBJECT_NAME_VALUE + "' field!");
+            return(false);
+        }
+        if(dbobject.keySet().size() < 1){
+            Log.e(TAG,"Invalid dbobject: No data to insert!");
+            return(false);
+        }
+        return(true);
+    }
+
+    public HashMap<String,String> validate2update(HashMap<String, String> dbobject){
+        if( !validate2insert(dbobject) ){ return(null); }
+        // ... check for existance
+        if(!dbobject.containsKey(COLUMN_ID) || TextUtils.isEmpty(dbobject.get(COLUMN_ID))){
+            Log.e(TAG,"Invalid dbobject: Abcense of mandatory '" + COLUMN_ID + "' field!");
+            return(null);
+        }
+        if(dbobject.keySet().size() < 2){
+            Log.e(TAG,"Invalid dbobject: No data to update!");
+            return(null);
+        }
+        String id = dbobject.get(COLUMN_ID);
+        HashMap<String,HashMap<String,String>> dbobjects = get_dbobjects(id);
+        if(dbobjects == null && !dbobjects.containsKey(id)){
+            Log.e(TAG,"Database object not exists: Nothing to update!");
+            return(null);
+        }
+        return(dbobjects.get(id));
+    }
+
+    public static void trip_dbobject(HashMap<String,String> dbobject, String... keys){
+        if(dbobject == null){ return; };
+        for(String key: keys){ dbobject.remove(key); }
+    }
+
+    /* === SQL part === */
+    public String insert(HashMap<String,String> dbobject){
+        if(!validate2insert(dbobject)){ return(null); }
+        String id = get_new_id();
+        String object_name = dbobject.get(OBJECT_NAME_VALUE);
+        trip_dbobject(dbobject,OBJECT_NAME_VALUE,"id");
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values ;
+        for(String key:dbobject.keySet()){
+            values = new ContentValues();
+            values.put(COLUMN_ID,id);
+            values.put(COLUMN_NAME,object_name);
+            values.put(COLUMN_FIELD, key);
+            values.put(COLUMN_VALUE, dbobject.get(key));
+            long _id = db.insert(TABLE_NAME, null,values);
+            Log.d(TAG,"Record inserted with id: " + _id);
+        }
+        return(id);
+    }
+
+    public String update(HashMap<String,String> dbobject){
+        HashMap<String,String> old_dbobject = validate2update(dbobject);
+        if( old_dbobject == null ){ return(null); }
+
+        String id = dbobject.get(COLUMN_ID);
+        String object_name = dbobject.get(OBJECT_NAME_VALUE);
+        trip_dbobject(dbobject,OBJECT_NAME_VALUE,"id");
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values ;
+        for(String key:dbobject.keySet()){
+            if( !old_dbobject.containsKey(key) ) {
+                values = new ContentValues();
+                values.put(COLUMN_ID, id);
+                values.put(COLUMN_NAME, object_name);
+                values.put(COLUMN_FIELD, key);
+                values.put(COLUMN_VALUE, dbobject.get(key));
+                long _id = db.insert(TABLE_NAME, null, values);
+                Log.d(TAG, "Record inserted with id: " + _id);
+            } else {
+                values = new ContentValues();
+                values.put(COLUMN_VALUE, dbobject.get(key));
+                String whereClause = "id = ? AND field = ?";
+                String[] whereArgs = {id,key};
+                long _id = db.update(TABLE_NAME, values, whereClause, whereArgs);
+                Log.d(TAG, "Record updated with id: " + _id);
+            }
+        }
+        return(id);
+    }
+
+
+    public HashMap<String,HashMap<String,String>> get_dbobjects(String... ids){
+        if(ids == null || ids.length == 0){
+            Log.e(TAG, "Invalid id for deletion!");
+            return(null);
+        }
+        SQLiteDatabase db = getReadableDatabase();
+        String where_part = WildSQLUtils.make_where_in_part(COLUMN_ID,ids.length);
+        Cursor cursor = db.query(TABLE_NAME,ALL_COLUMNS,where_part,ids,null,null,null);
+        return(generate_dbobjects(cursor));
+    }
+
+    public HashMap<String,HashMap<String,String>> get_all_dbobjects(){
+        return(get_all_dbobjects(null,null));
+    }
+
+    public HashMap<String,HashMap<String,String>> get_all_dbobjects(String selection, String... args){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME,ALL_COLUMNS,selection,args,null,null,null);
+        return(generate_dbobjects(cursor));
     }
 
     public void delete_dbobjects(String... ids){

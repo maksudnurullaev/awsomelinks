@@ -50,10 +50,11 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 addLinkAddresses();
                 break;
             case (R.id.action_file):
-                WildSQLUtils.test_1(getActivity().getApplicationContext());
-                WildSQLUtils.test_2(getActivity().getApplicationContext());
-                WildSQLUtils.test_3(getActivity().getApplicationContext());
-                WildSQLUtils.test_4(getActivity().getApplicationContext());
+                //WildSQLUtils.test_1(getActivity().getApplicationContext());
+                //WildSQLUtils.test_2(getActivity().getApplicationContext());
+                //WildSQLUtils.test_3(getActivity().getApplicationContext());
+                //WildSQLUtils.test_4(getActivity().getApplicationContext());
+                WildSQLUtils.test_5(getActivity().getApplicationContext());
                 break;
             default:
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown click id: " + id, Toast.LENGTH_SHORT).show();
