@@ -16,7 +16,7 @@ public class WildSQLUtils {
     public static void test_1(Context context) {
         // clear test dbobjects from database
         clear_test_dbobjects(context);
-        // add some tet objects
+        // add some testobjects
         test_add_dbobjects(context, "test objects 1", 4, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
@@ -24,13 +24,15 @@ public class WildSQLUtils {
         // log all dbobjects
         // test_log_objects(dbobjects);
         my_assert(dbobjects.size() == 4, "Test #1, create some dbobjects!");
+        // clear test dbobjects from database
+        clear_test_dbobjects(context);
     }
 
     // ... simple add + delete
     public static void test_2(Context context) {
         // clear test dbobjects from database
         clear_test_dbobjects(context);
-        // add some tet objects
+        // add some testobjects
         test_add_dbobjects(context, "test objects 1", 4, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
@@ -42,15 +44,17 @@ public class WildSQLUtils {
             dbase.delete_dbobjects(id);
         }
         // check again
-        dbobjects = dbase.get_all_dbobjects();
+        dbobjects = dbase.get_dbobjects_all();
         my_assert(dbobjects == null || dbobjects.size() == 0, "Test #2, delete all test dbobjects");
+        // clear test dbobjects from database
+        clear_test_dbobjects(context);
     }
 
     // ... simple add + scope delete
     public static void test_3(Context context) {
         // clear test dbobjects from database
         clear_test_dbobjects(context);
-        // add some tet objects
+        // add some testobjects
         test_add_dbobjects(context, "test objects 1", 14, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
@@ -60,15 +64,17 @@ public class WildSQLUtils {
         // delete all test objects
         dbase.delete_dbobjects(dbobjects.keySet().toArray(new String[dbobjects.keySet().size()]));
         // check again
-        dbobjects = dbase.get_all_dbobjects();
+        dbobjects = dbase.get_dbobjects_all();
         my_assert(dbobjects == null || dbobjects.size() == 0, "Test #3, scope deletion of dbobjects!");
+        // clear test dbobjects from database
+        clear_test_dbobjects(context);
     }
 
     // ... simple add + test id & field
     public static void test_4(Context context) {
         // clear test dbobjects from database
         clear_test_dbobjects(context);
-        // add some tet objects
+        // add some testobjects
         test_add_dbobjects(context, "test objects 1", 14, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
@@ -79,17 +85,19 @@ public class WildSQLUtils {
         String firstId = ids[0], lastId = ids[ids.length-1];
         dbobjects = dbase.get_dbobjects(firstId,lastId);
         my_assert(dbobjects.containsKey(firstId) && dbobjects.containsKey(lastId),"Test #4, test existance of dbobjects!");
+        // clear test dbobjects from database
+        clear_test_dbobjects(context);
     }
 
     // ... simple add + update
     public static void test_5(Context context) {
         // clear test dbobjects from database
         clear_test_dbobjects(context);
-        // add some tet objects
+        // add some testobjects
         test_add_dbobjects(context, "test objects 1", 1, 5);
         // get all objects from database
         WildSQLBase dbase = new WildSQLBase(context);
-        HashMap<String, HashMap<String, String>> dbobjects = dbase.get_all_dbobjects();
+        HashMap<String, HashMap<String, String>> dbobjects = dbase.get_dbobjects_all();
         my_assert(dbobjects.size() == 1, "Test #5, create test dbobjects!");
         String[] ids = dbobjects.keySet().toArray(new String[dbobjects.keySet().size()]);
         String firstId = ids[0], lastId = ids[ids.length-1];
@@ -109,6 +117,29 @@ public class WildSQLUtils {
             my_assert(firstObject.get("new key 1").equals("new value 1"), "Test #4, Check for new field of updated dbobject!");
             my_assert(firstObject.get("test field 1").equals("new test value 1"), "Test #4, Check for updated field of updated dbobject!");
         }
+        // clear test dbobjects from database
+        clear_test_dbobjects(context);
+    }
+    
+    /// ... add different dbobjects and test totals count of them
+    public static void test_6(Context context){
+        // clear test dbobjects from database        
+        clear_test_dbobjects(context);
+        // add some testobjects
+        WildSQLBase dbase = new WildSQLBase(context);
+        test_add_dbobjects(context, "test objects 2", 2, 5);
+        test_add_dbobjects(context, "test objects 3", 3, 5);
+        HashMap<String, String> dbobjects_totals = dbase.get_dbobjects_names();
+        my_assert(dbobjects_totals.containsKey("test objects 2") &&
+                  dbobjects_totals.containsKey("test objects 3"), "Test #6, Check count of dbobjects, stage #1!" );
+        my_assert(dbobjects_totals.get("test objects 2").equals("2") &&
+                  dbobjects_totals.get("test objects 3").equals("3"), "Test #6, Check count of dbobjects, stage #2!" );
+        dbobjects_totals = dbase.get_dbobjects_names("test objects 3");
+        my_assert(dbobjects_totals.size() == 1, "Test #6, Check count of dbobjects, stage #3!" );
+        my_assert(dbobjects_totals.containsKey("test objects 3") &&
+                dbobjects_totals.get("test objects 3").equals("3"), "Test #6, Check count of dbobjects, stage #4!" );
+        // clear test dbobjects from database
+        clear_test_dbobjects(context);
     }
 
     /* ===  UTILITIES ==== */
@@ -166,6 +197,6 @@ public class WildSQLUtils {
     }
 
     public static HashMap<String, HashMap<String, String>> get_all_test_dbobjects(WildSQLBase dbase){
-        return( dbase.get_all_dbobjects(WildSQLBase.COLUMN_NAME + " like 'test%'", null) );
+        return( dbase.get_dbobjects_all(WildSQLBase.COLUMN_NAME + " like 'test%'", null) );
     }
 }

@@ -1,6 +1,7 @@
 package com.awsomelink;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -16,8 +17,10 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.awsomelink.base.Contact;
 import com.awsomelink.db.wildsql.WildSQLBase;
 import com.awsomelink.db.wildsql.WildSQLUtils;
+import com.awsomelink.utils.VCard;
 
 import java.util.HashMap;
 
@@ -27,6 +30,7 @@ import java.util.HashMap;
 
 public class OutboxFragment extends Fragment implements MainActivity.ContentFragment {
     public static final String TAG = "OutboxFragment";
+    public static final int CONTACTS_REQUEST_CODE = 1001;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -54,7 +58,8 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 //WildSQLUtils.test_2(getActivity().getApplicationContext());
                 //WildSQLUtils.test_3(getActivity().getApplicationContext());
                 //WildSQLUtils.test_4(getActivity().getApplicationContext());
-                WildSQLUtils.test_5(getActivity().getApplicationContext());
+                //WildSQLUtils.test_5(getActivity().getApplicationContext());
+                WildSQLUtils.test_6(getActivity().getApplicationContext());
                 break;
             default:
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown click id: " + id, Toast.LENGTH_SHORT).show();
@@ -63,30 +68,26 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
 
     private void addLinkAddresses(){
         Intent i = new Intent(getActivity(),ContactsActivity.class);
-        startActivity(i);
+        startActivityForResult(i, CONTACTS_REQUEST_CODE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if( data == null ){ return; }
+
         switch (requestCode) {
-            case 1001:
-
-                if (resultCode == Activity.RESULT_OK) {
-
-                    Cursor s = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                            null, null, null);
-
-                    if (s.moveToFirst()) {
-                        String phoneNum = s.getString(s.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        Toast.makeText(getActivity().getBaseContext(), phoneNum, Toast.LENGTH_LONG).show();
-                    }
-                    s.close();
-
+            case CONTACTS_REQUEST_CODE:
+                if( data.hasExtra(ContactsActivity.EXTRA_CONTACTS_KEY) ){
+                    Context context = getActivity().getApplicationContext();
+                    HashMap<String,Contact> contacts = (HashMap<String,Contact>) data.getSerializableExtra(ContactsActivity.EXTRA_CONTACTS_KEY);
+                    //Toast.makeText(context,"Contacts size: " + contacts.size(),Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Contacts size: " + contacts.size());
+                    VCard.toFile(context, contacts);
                 }
-
                 break;
-
+            default:
+                Toast.makeText(getActivity().getApplicationContext(), "Unknown REQEST CODE: " + requestCode, Toast.LENGTH_SHORT).show();
         }
     }
 

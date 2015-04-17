@@ -25,6 +25,7 @@ public class WildSQLBase extends SQLiteOpenHelper {
     public static final String COLUMN_NAME   = "name";
     public static final String COLUMN_FIELD  = "field";
     public static final String COLUMN_VALUE  = "value";
+    public static final String COLUMN__TOTAL = "total";
     public static final String OBJECT_NAME_VALUE = "object_name";
     public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_NAME, COLUMN_FIELD, COLUMN_VALUE};
 
@@ -172,7 +173,6 @@ public class WildSQLBase extends SQLiteOpenHelper {
         return(id);
     }
 
-
     public HashMap<String,HashMap<String,String>> get_dbobjects(String... ids){
         if(ids == null || ids.length == 0){
             Log.e(TAG, "Invalid id for deletion!");
@@ -184,14 +184,37 @@ public class WildSQLBase extends SQLiteOpenHelper {
         return(generate_dbobjects(cursor));
     }
 
-    public HashMap<String,HashMap<String,String>> get_all_dbobjects(){
-        return(get_all_dbobjects(null,null));
+    public HashMap<String,HashMap<String,String>> get_dbobjects_all(){
+        return(get_dbobjects_all(null, null));
     }
 
-    public HashMap<String,HashMap<String,String>> get_all_dbobjects(String selection, String... args){
+    public HashMap<String,HashMap<String,String>> get_dbobjects_all(String selection, String... args){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME,ALL_COLUMNS,selection,args,null,null,null);
         return(generate_dbobjects(cursor));
+    }
+
+    public HashMap<String,String> get_dbobjects_names(String... names){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null ;
+        if( names == null || names.length == 0) {
+            cursor = db.rawQuery("SELECT name, COUNT(id) as total FROM (SELECT distinct name, id FROM objects) GROUP BY name", null);
+        } else {
+            String wherePart = WildSQLUtils.make_where_in_part(COLUMN_NAME,names.length);
+            cursor = db.rawQuery("SELECT name, COUNT(id) as total FROM (SELECT distinct name, id FROM objects WHERE " + wherePart +  ") GROUP BY name", names);
+        }
+        if(cursor == null || cursor.getCount() == 0 ){
+            Log.w(TAG, "Invalid cursor: Nothing to generate to dbobjects!");
+            return(null);
+        }
+        HashMap<String,String> dbobjects = new HashMap<>();
+        cursor.moveToFirst();
+        do {
+            String dbobject_name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME));
+            String dbobject_total = cursor.getString(cursor.getColumnIndex(COLUMN__TOTAL));
+            dbobjects.put(dbobject_name,dbobject_total);
+        }while(cursor.moveToNext());
+        return(dbobjects);
     }
 
     public void delete_dbobjects(String... ids){

@@ -134,6 +134,19 @@ public class ContactsCursorAdapter extends CursorAdapter {
         return(result);
     }
 
+    public HashMap<String,Contact> getCheckedContacts(){
+        HashMap<String,Contact> contactsMap = new HashMap<>();
+        int result = 0;
+        for(String displayName:mContactsMap.keySet()){
+            if(mContactsMap.get(displayName).get_checked()){
+                result++;
+                contactsMap.put(displayName,mContactsMap.get(displayName));
+            }
+        }
+        if(result == 0) return(null);
+        return(contactsMap);
+    }
+
     public void checkAllAs(boolean value){
         for(String displayName:mContactsMap.keySet()) {
             setTitleChecked(displayName,value,true);

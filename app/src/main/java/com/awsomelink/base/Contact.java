@@ -1,11 +1,12 @@
 package com.awsomelink.base;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Created by m.nurullayev on 02.04.2015.
  */
-public class Contact {
+public class Contact implements Serializable {
     private String _id;
     private String _lookup_key;
     private String _display_name;

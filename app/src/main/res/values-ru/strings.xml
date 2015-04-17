@@ -24,4 +24,5 @@
     <string name="select_reverse">Реверс выборки</string>
     <string name="loading">Загрузка…</string>
     <string name="Make_link">Создать ссылку</string>
+    <string name="Nothing_selected">Нет данных</string>
 </resources>
