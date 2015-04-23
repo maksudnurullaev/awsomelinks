@@ -24,14 +24,50 @@ public class MetaFile {
     public static String setMeta(Context context, Links.ITEM_TYPE itemType, String linkId, String metaString){
         try{
             File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            pw.println(metaString);
-            pw.close();
-            return(file.getAbsolutePath());
+            if( !file.exists() ) {
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+                pw.println(metaString);
+                pw.close();
+            } else {
+                MetaItem metaItem = MetaItem.string2Meta(metaString);
+                List<MetaItem> metaItems = getMeta(context, itemType, linkId);
+                setMeta(context,itemType,linkId, addOrReplace(metaItems,metaItem));
+            }
+            return (file.getAbsolutePath());
         } catch (IOException e){
             Log.e(TAG, e.getMessage());
             return(null);
         }
+    }
+
+    public static String setMeta(Context context, Links.ITEM_TYPE itemType, String linkId, List<MetaItem> metaItems){
+        try{
+            File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            for(MetaItem metaItem:metaItems){
+                pw.println(MetaItem.meta2String(metaItem));
+            }
+            pw.close();
+            return (file.getAbsolutePath());
+        } catch (IOException e){
+            Log.e(TAG, e.getMessage());
+            return(null);
+        }
+    }
+
+    public static List<MetaItem> addOrReplace(List<MetaItem> metaItems, MetaItem metaItem){
+        boolean alreadyExist = false;
+        List<MetaItem> result = new ArrayList<>();
+        for(MetaItem mi:metaItems){
+            if( !alreadyExist && mi.mType == metaItem.mType ){
+                alreadyExist = true;
+                result.add(metaItem);
+            } else {
+                result.add(mi);
+            }
+        }
+        if( !alreadyExist ) { result.add(metaItem); }
+        return(result);
     }
 
     public static String getMetaDescription(Context context, Links.ITEM_TYPE itemType, String linkId){
@@ -71,7 +107,7 @@ public class MetaFile {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
             while((line = br.readLine()) != null ){
-                MetaItem metaItem = MetaItem.parseMetaString(line);
+                MetaItem metaItem = MetaItem.string2Meta(line);
                 if( metaItem.mType != MetaItem.TYPE.UNKNOWN){
                     result.add(metaItem);
                     Log.d(TAG, "Found meta item: " +  MetaItem.getType(metaItem.mType));

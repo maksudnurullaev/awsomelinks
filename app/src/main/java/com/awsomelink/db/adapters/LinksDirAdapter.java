@@ -2,6 +2,7 @@ package com.awsomelink.db.adapters;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import java.util.List;
  * Created by m.nurullayev on 21.04.2015.
  */
 public class LinksDirAdapter extends ArrayAdapter<String> {
+    public static final String TAG = "LinksDirAdapter";
+
     Context mContext = null;
     Fragment mFragment = null;
 
@@ -42,8 +45,7 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
         tvID.setText(id);
         TextView tvDesc = (TextView)convertView.findViewById(R.id.textDesc);
         tvDesc.setText(MetaFile.getMetaDescription(mContext,Links.ITEM_TYPE.OUT_BOX, id));
-        // List<MetaItem> metas = MetaFile.getMeta(mContext, Links.ITEM_TYPE.OUT_BOX, id);
-        // setup proper button click action, TODO should be single and more optimal method of initilazing
+        Log.d(TAG, "Make LinkItem view for position:" + position);
         setUpButtonActions(convertView, id, R.id.button_delete, Links.ITEM_ACTION.DELETE, Links.ITEM_TYPE.OUT_BOX);
         setUpButtonActions(convertView, id, R.id.button_more, Links.ITEM_ACTION.MORE, Links.ITEM_TYPE.OUT_BOX);
         setUpButtonActions(convertView, id, R.id.button_share, Links.ITEM_ACTION.SHARE, Links.ITEM_TYPE.OUT_BOX);
