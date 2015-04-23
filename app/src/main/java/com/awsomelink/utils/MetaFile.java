@@ -31,7 +31,7 @@ public class MetaFile {
             } else {
                 MetaItem metaItem = MetaItem.string2Meta(metaString);
                 List<MetaItem> metaItems = getMeta(context, itemType, linkId);
-                setMeta(context,itemType,linkId, addOrReplace(metaItems,metaItem));
+                setMeta(context, itemType, linkId, addOrReplace(metaItems, metaItem));
             }
             return (file.getAbsolutePath());
         } catch (IOException e){
@@ -84,6 +84,7 @@ public class MetaFile {
                     }
                     break;
                 default:
+                    if( metaItem.mType == MetaItem.TYPE.PASSWORD ||  metaItem.mType == MetaItem.TYPE.AWSYNCHRONIZED ) break;
                     if( result.containsKey(metaItem.mType) ){
                         result.put(metaItem.mType, result.get(metaItem.mType) + 1);
                     } else {

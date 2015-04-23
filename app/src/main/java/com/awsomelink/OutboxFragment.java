@@ -141,6 +141,7 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 Log.d(TAG, "Meta string saved on: " + metaPath);
                 Log.d(TAG, "Meta string : " + metaString);
                 metaString = MetaItem.makeMetaString(MetaItem.TYPE.AWSYNCHRONIZED, String.valueOf(false));
+                metaPath = MetaFile.setMeta(context, Links.ITEM_TYPE.OUT_BOX,linkItemAction.mID,metaString);
                 Log.d(TAG, "Meta string : " + metaString);
             }
             refresh_list_adapter();

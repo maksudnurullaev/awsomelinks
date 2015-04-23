@@ -35,9 +35,9 @@ public class MetaItem {
     public static String meta2String(MetaItem metaItem){
         if( metaItem == null || metaItem.mType == TYPE.UNKNOWN ){ return(null); }
         String result = MetaItem.getType(metaItem.mType);
-        if( metaItem.content != null || !metaItem.content.isEmpty()){
+        if( metaItem.content != null && !metaItem.content.isEmpty()){
             result += DELIMTER + metaItem.content;
-            if( metaItem.description != null || !metaItem.description.isEmpty()){
+            if( metaItem.description != null && !metaItem.description.isEmpty()){
                 result += DELIMTER + metaItem.description;
             }
         }
