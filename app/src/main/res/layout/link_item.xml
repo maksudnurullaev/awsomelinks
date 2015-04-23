@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="ID"
+        android:id="@+id/textID"
+        android:textColor="#ff4a4a4a"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/button_share"
+        android:layout_toStartOf="@+id/button_share"
+        android:layout_marginLeft="2dp" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X"
+        android:id="@+id/button_delete"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="#ffff724c" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="..."
+        android:id="@+id/button_more"
+        android:layout_alignBottom="@+id/button_delete"
+        android:layout_toLeftOf="@+id/button_delete"
+        android:layout_toStartOf="@+id/button_delete"
+        android:textColor="@android:color/black" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/Share"
+        android:id="@+id/button_share"
+        android:layout_alignBottom="@+id/button_more"
+        android:layout_toLeftOf="@+id/button_more"
+        android:layout_toStartOf="@+id/button_more"
+        android:textColor="#ff2199ff"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-:-"
+        android:id="@+id/textDesc"
+        android:layout_below="@+id/textID"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/button_share"
+        android:layout_toStartOf="@+id/button_share"
+        android:layout_marginLeft="2dp" />
+
+</RelativeLayout>

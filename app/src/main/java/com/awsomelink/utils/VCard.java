@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.awsomelink.base.Contact;
+import com.awsomelink.base.LinkItemAction;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,16 +21,17 @@ import java.util.Map;
 public class VCard {
     private static final String TAG = "VCard";
 
-    public static void toFile(Context context, Map<String, Contact> contacts){
+    public static LinkItemAction toFile(Context context, Map<String, Contact> contacts){
         if( contacts == null || contacts.size() == 0 ){
             Log.w(TAG, "No contacts to save!");
-            return ;
+            return(null);
         }
+        String newLinkId = Links.getNewLinkID();
+        LinkItemAction linkItemAction = new LinkItemAction(newLinkId);
         try {
-            File file = Links.getNewVCardFilePath(context);
+            File file = Links.getNewVCardFilePath(context, newLinkId);
             Log.d(TAG, "New VCF file: " + file.getAbsolutePath());
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            // TODO make actual save all data to vcf file by VCF API
             for (String key : contacts.keySet()) {
                 Log.d(TAG, "Make vcard record for contact: " + key);
                 pw.println("BEGIN:VCARD");
@@ -46,9 +48,34 @@ public class VCard {
                 }
                 pw.println("END:VCARD");
             }
-
+            pw.close();
+            linkItemAction.mFileName = file.getName();
         } catch (IOException e){
             Log.e(TAG, e.getMessage());
+            return(null);
         }
+        return(linkItemAction);
     }
+
+    public static String getN(String name){
+        String result = "N:";
+        String[] aResult = name.split(" ", 2);
+        if( aResult.length == 2 ){
+            result += aResult[1];
+            result += ";";
+            result += aResult[0];
+        } else {
+            result += name;
+        }
+        return(result);
+    }
+
+    public static String getFN(String name){
+        return("FN:" + name.trim());
+    }
+
+    public static String getTEL(String tel){
+        return("TEL;WORK;VOICE:" + tel);
+    }
+
 }

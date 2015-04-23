@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="contact_phone_tag_display_name" type="id" />
+    <!-- LinkItem part -->
+    <item name="item_type" type="id" />
+    <item name="item_type_outbox" type="id" />
+    <item name="item_btn_type" type="id" />
+    <item name="item_btn_type_delete" type="id" />
 </resources>

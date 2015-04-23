@@ -25,4 +25,6 @@
     <string name="loading">Loading…</string>
     <string name="Make_link">Make link</string>
     <string name="Nothing_selected">Nothing selected</string>
+    <string name="Share">Share</string>
+    <string name="Files">Files</string>
 </resources>
