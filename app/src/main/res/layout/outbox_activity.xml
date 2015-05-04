@@ -5,7 +5,7 @@
     tools:context="com.awsomelink.OutboxActivity"
     tools:ignore="MergeRootFrame" >
     <RelativeLayout
-        android:id="@+id/outbox_activity_fragment_place"
+        android:id="@+id/outbox_links_list_fragment_place"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
     </RelativeLayout>

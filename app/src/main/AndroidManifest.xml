@@ -11,6 +11,7 @@
     <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <android:uses-permission android:name="android.permission.READ_CONTACTS" />
     <android:uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <android:uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"

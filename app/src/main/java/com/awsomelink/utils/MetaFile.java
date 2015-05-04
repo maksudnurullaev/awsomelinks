@@ -3,6 +3,8 @@ package com.awsomelink.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.awsomelink.R;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,17 +23,33 @@ public class MetaFile {
     public static final String TAG = "MetaFile";
     public static final String FILE_NAME = "META.TXT";
 
-    public static String setMeta(Context context, Links.ITEM_TYPE itemType, String linkId, String metaString){
+    public static boolean addEmptyMeta(Context context, Links.ITEM_TYPE itemType, String linkId){
         try{
             File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
             if( !file.exists() ) {
+                return( file.createNewFile() );
+            }
+            return (true);
+        } catch (IOException e){
+            Log.e(TAG, e.getMessage());
+        }
+        return(false);
+    }
+
+    public static String setMeta(Context context, Links.ITEM_TYPE itemType, String linkId, String metaString){
+        try{
+            File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
+            List<MetaItem> metaItems = null;
+            if( file.exists() ) {
+                metaItems = MetaFile.getMeta(file);
+            }
+            if (metaItems != null && metaItems.size() > 0) {
+                MetaItem metaItem = MetaItem.string2Meta(metaString);
+                setMeta(context, itemType, linkId, addOrReplace(metaItems, metaItem));
+            } else {
                 PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
                 pw.println(metaString);
                 pw.close();
-            } else {
-                MetaItem metaItem = MetaItem.string2Meta(metaString);
-                List<MetaItem> metaItems = getMeta(context, itemType, linkId);
-                setMeta(context, itemType, linkId, addOrReplace(metaItems, metaItem));
             }
             return (file.getAbsolutePath());
         } catch (IOException e){
@@ -70,9 +88,8 @@ public class MetaFile {
         return(result);
     }
 
-    public static String getMetaDescription(Context context, Links.ITEM_TYPE itemType, String linkId){
-        List<MetaItem> metaItems = getMeta(context,itemType,linkId);
-        if(metaItems.size() == 0) { return("-:-"); }
+    public static String getMetaDescription(Context context, List<MetaItem> metaItems){
+        if(metaItems == null || metaItems.size() == 0) { return("-:-"); }
         HashMap<MetaItem.TYPE,Integer> result = new HashMap<>();
         for(MetaItem metaItem: metaItems){
             switch (metaItem.mType){
@@ -101,10 +118,13 @@ public class MetaFile {
         return(resultString);
     }
 
-    public static List<MetaItem> getMeta(Context context, Links.ITEM_TYPE itemType, String linkId){
+    public static File getMetaFile(Context context, Links.ITEM_TYPE itemType, String linkId){
+        return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME));
+    }
+
+    public static List<MetaItem> getMeta(File file){
         List<MetaItem> result = new ArrayList<>();
         try{
-            File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
             while((line = br.readLine()) != null ){
@@ -119,5 +139,24 @@ public class MetaFile {
             Log.e(TAG, e.getMessage());
             return(null);
         }
+    }
+
+    public static boolean isAWSynchonized(Context context, Links.ITEM_TYPE itemType, String linkId){
+        List<MetaItem> metaItems = getMeta(getMetaFile(context, itemType,linkId));
+        MetaItem metaItem = getMetaItem(metaItems,MetaItem.TYPE.AWSYNCHRONIZED);
+        if( metaItem == null ){ return(false); }
+        Log.d(TAG, "Find awsync status for: " + linkId + ", status: "  + metaItem.content);
+        if( metaItem != null && metaItem.content != null && Boolean.valueOf(metaItem.content) ) {
+
+            return (true);
+        }
+        return(false);
+    }
+
+    public static MetaItem getMetaItem(List<MetaItem> metaItems, MetaItem.TYPE type){
+        for(MetaItem metaItem:metaItems){
+            if(metaItem.mType == type) return metaItem;
+        }
+        return(null);
     }
 }

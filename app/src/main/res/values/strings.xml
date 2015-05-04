@@ -27,4 +27,13 @@
     <string name="Nothing_selected">Nothing selected</string>
     <string name="Share">Share</string>
     <string name="Files">Files</string>
+    <string name="Are_you_sure">Are you sure?</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
+    <string name="Synchronize">Synchronize</string>0
+    <string name="Error">Error!</string>
+    <string name="Add_new_link">Add new link</string>
+    <string name="Link">Ссылка</string>
+    <string name="title_activity_link">Link</string>
+    <string name="hello_world">Hello world!</string>
 </resources>

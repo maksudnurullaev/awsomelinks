@@ -18,7 +18,7 @@ public class OutboxActivity extends ActionBarActivity {
         setContentView(R.layout.outbox_activity);
         if (savedInstanceState == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.outbox_activity_fragment_place, new OutboxFragment());
+            ft.add(R.id.outbox_links_list_fragment_place, new OutboxFragment());
             ft.commit();
         }
     }

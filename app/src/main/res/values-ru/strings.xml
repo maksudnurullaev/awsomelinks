@@ -27,4 +27,11 @@
     <string name="Nothing_selected">Нет данных</string>
     <string name="Share">Раздать</string>
     <string name="Files">Файлы</string>
+    <string name="Are_you_sure">Вы уверены?</string>
+    <string name="Yes">Да</string>
+    <string name="No">Нет</string>
+    <string name="Synchronize">Обновить</string>0
+    <string name="Error">Ошибка!</string>
+    <string name="All_new_link">Добавить новую ссылку</string>
+    <string name="Link">Ссылка</string>
 </resources>

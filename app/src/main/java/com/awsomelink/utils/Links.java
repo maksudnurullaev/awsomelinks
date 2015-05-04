@@ -1,11 +1,15 @@
 package com.awsomelink.utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Environment;
+import android.util.Log;
 
 import com.awsomelink.base.LinkItemAction;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +21,7 @@ public class Links {
     public static final String TAG = "Links";
 
     public enum ITEM_TYPE {OUT_BOX, IN_BOX};
-    public enum ITEM_ACTION {DELETE, MORE, SHARE};
+    public enum ITEM_ACTION {DELETE, MORE, SHARE, AWSYNC, ADD_NEW_LINK};
 
     public static final String OUT_FOLDER = "OUT";
     public static final String IN_FOLDER = "IN";
@@ -64,6 +68,12 @@ public class Links {
         return(file);
     }
 
+    public static File addNewLink(Context context, String linkId){
+        File file = new File(context.getFilesDir(), mkpath(OUT_FOLDER, linkId));
+        file.mkdir();
+        return(file);
+    }
+
     public static File getNewVCardFilePath(Context context, String linkId){
         File file = new File(context.getFilesDir(), mkpath(OUT_FOLDER, linkId, getNewLinkID()) + ".vcf");
         file.getParentFile().mkdirs();
@@ -90,9 +100,9 @@ public class Links {
     }
 
     /* Delete link item */
-    public static void deleteLinkItem(Context context, LinkItemAction linkItemAction){
-        File folder = getFolderLink(context, linkItemAction.mItemType, linkItemAction.mID);
-        deleteLinkItem(folder);
+    public static void deleteLinkItem(final Context context, final LinkItemAction linkItemAction){
+                File folder = getFolderLink(context, linkItemAction.mItemType, linkItemAction.mID);
+                deleteLinkItem(folder);
     }
 
     public static void deleteLinkItem(File folder){
@@ -102,6 +112,5 @@ public class Links {
         }
         folder.delete();
     }
-
 
 }
