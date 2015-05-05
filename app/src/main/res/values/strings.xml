@@ -10,7 +10,7 @@
     <string name="Inbox">Inbox</string>
     <string name="select_action">Select action</string>
     <string name="empty">Empty</string>
-    <string name="add">Add</string>
+    <string name="Add">Add</string>
     <string name="Addresses">Address book</string>
     <string name="Images">Images</string>
     <string name="Video">Video</string>
@@ -36,4 +36,6 @@
     <string name="Link">Ссылка</string>
     <string name="title_activity_link">Link</string>
     <string name="hello_world">Hello world!</string>
+    <string name="Description">Desription</string>
+    <string name="Password_Optional">Password(Optional)</string>
 </resources>

@@ -46,6 +46,9 @@
             android:name=".ContactsActivity"
             android:label="@string/Contacts" >
         </activity>
+        <activity android:name=".LinkActivity"
+            android:label="@string/Link">
+        </activity>
     </application>
 
 </manifest>

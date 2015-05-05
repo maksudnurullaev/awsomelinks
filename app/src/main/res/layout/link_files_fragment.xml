@@ -10,19 +10,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/Add"
-            android:id="@+id/add_link_btn"
-            android:layout_gravity="right|bottom"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
-            android:textColor="#ff0000ff"
-            android:onClick="clickDispatcher"
-            android:clickable="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Outbox"
+            android:text="@string/Files"
             android:id="@+id/title_inbox_text"
             android:layout_gravity="left|bottom"
             android:layout_marginLeft="5dp"

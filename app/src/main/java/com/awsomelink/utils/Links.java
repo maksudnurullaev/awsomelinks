@@ -26,6 +26,8 @@ public class Links {
     public static final String OUT_FOLDER = "OUT";
     public static final String IN_FOLDER = "IN";
 
+    public static final String LINK_ID = "LINK_ID";
+
     public static String getNewLinkID(){
         // TODO may be needs to replace something else...
         return(UUID.randomUUID().toString().substring(0, 8));

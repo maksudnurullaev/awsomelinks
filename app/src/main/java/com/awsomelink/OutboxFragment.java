@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.awsomelink.base.Contact;
 import com.awsomelink.base.LinkItemAction;
 import com.awsomelink.db.adapters.LinksDirAdapter;
@@ -27,6 +28,7 @@ import com.awsomelink.utils.MetaFile;
 import com.awsomelink.utils.MetaItem;
 import com.awsomelink.utils.Utils;
 import com.awsomelink.utils.VCard;
+
 import java.io.File;
 import java.util.HashMap;
 
@@ -116,8 +118,9 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 yesNoDialog(linkItemAction,getResources().getString(R.string.Are_you_sure));
                 break;
             case MORE:
-                //Intent i = new Intent(getActivity(), LinkActivity.class);
-                //startActivityForResult(i, LINK_REQUEST_CODE);
+                Intent i = new Intent(getActivity(), LinkActivity.class);
+                i.putExtra(Links.LINK_ID, linkItemAction.mID);
+                startActivityForResult(i, LINK_REQUEST_CODE);
                 break;
             case SHARE:
                 Toast.makeText(getActivity().getApplicationContext(), "Link SHARE action: " + linkItemAction.mID,Toast.LENGTH_SHORT ).show();
@@ -154,17 +157,6 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, LINK_IMAGE_FROM_GALLERY_REQUEST_CODE);
-                break;
-            case (R.id.action_file):
-                //WildSQLUtils.test_1(getActivity().getApplicationContext());
-                //WildSQLUtils.test_2(getActivity().getApplicationContext());
-                //WildSQLUtils.test_3(getActivity().getApplicationContext());
-                //WildSQLUtils.test_4(getActivity().getApplicationContext());
-                //WildSQLUtils.test_5(getActivity().getApplicationContext());
-                //WildSQLUtils.test_6(getActivity().getApplicationContext());
-                intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("file/*");
-                startActivityForResult(intent, LINK_FILE_REQUEST_CODE);
                 break;
             default:
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown click id: " + id, Toast.LENGTH_SHORT).show();
@@ -235,7 +227,7 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 return true;
             }
         });
-        inflater.inflate(R.menu.menu_outbox, popup.getMenu());
+        inflater.inflate(R.menu.menu_add_link, popup.getMenu());
         popup.show();
     }
 

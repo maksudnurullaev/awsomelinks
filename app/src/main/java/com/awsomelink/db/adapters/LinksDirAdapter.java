@@ -40,7 +40,7 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
     public View getView(int position, View convertView, ViewGroup parent) {
         String id = getItem(position);
         if( convertView == null ){
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.link_item,parent,false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.link_item_list_row,parent,false);
         }
         // set ID as title text
         TextView tvID = (TextView)convertView.findViewById(R.id.textID);
