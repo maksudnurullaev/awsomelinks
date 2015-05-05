@@ -7,15 +7,15 @@ import com.awsomelink.utils.Links;
  */
 public class LinkItemAction {
     public String mID;
-    public Links.ITEM_ACTION mLinkAction;
-    public Links.ITEM_TYPE mItemType;
+    public Links.LINK_ACTION mLinkAction;
+    public Links.LINK_TYPE mItemType;
     public String mFileName;
 
     public LinkItemAction(String id){
         this.mID = id;
     }
 
-    public LinkItemAction(String id, Links.ITEM_ACTION linkAction, Links.ITEM_TYPE dirType){
+    public LinkItemAction(String id, Links.LINK_ACTION linkAction, Links.LINK_TYPE dirType){
         this.mID = id;
         this.mLinkAction = linkAction;
         this.mItemType = dirType;

@@ -38,12 +38,9 @@ import java.util.HashMap;
 
 public class OutboxFragment extends Fragment implements MainActivity.ContentFragment, View.OnClickListener, RefreshableFragment {
     public static final String TAG = "OutboxFragment";
-    public static final int LINK_CONTACTS_REQUEST_CODE = 1001;
-    public static final int LINK_FILE_REQUEST_CODE = 1002;
-    public static final int LINK_IMAGE_FROM_GALLERY_REQUEST_CODE = 1003;
-    public static final int LINK_IMAGE_FROM_CAMERA_REQUEST_CODE = 1004;
-    public static final int LINK_REQUEST_CODE = 1005;
+
     private LinksDirAdapter linksDirAdapter = null;
+    public static final int LINK_REQUEST_CODE = 1005;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -59,7 +56,7 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
             TextView textEmpty = (TextView) getActivity().findViewById(R.id.textViewEmpty);
             if( textEmpty != null){ lv.setEmptyView(textEmpty); }
 
-            linksDirAdapter = new LinksDirAdapter(getActivity().getApplicationContext(), 0, (Fragment)this, Links.ITEM_TYPE.OUT_BOX);
+            linksDirAdapter = new LinksDirAdapter(getActivity().getApplicationContext(), 0, (Fragment)this, Links.LINK_TYPE.OUT);
             lv.setAdapter(linksDirAdapter);
         }
     }
@@ -95,7 +92,7 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                         break;
                     case ADD_NEW_LINK:
                         Links.addNewLink(context, linkItemAction.mID);
-                        MetaFile.addEmptyMeta(context, Links.ITEM_TYPE.OUT_BOX, linkItemAction.mID);
+                        MetaFile.addEmptyMeta(context, Links.LINK_TYPE.OUT, linkItemAction.mID);
                         refresh_list_adapter();
                         break;
                     default:
@@ -119,7 +116,8 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 break;
             case MORE:
                 Intent i = new Intent(getActivity(), LinkActivity.class);
-                i.putExtra(Links.LINK_ID, linkItemAction.mID);
+                i.putExtra(Links.LINK_ID_KEY, linkItemAction.mID);
+                i.putExtra(Links.LINK_TYPE_KEY, Links.LINK_TYPE.OUT);
                 startActivityForResult(i, LINK_REQUEST_CODE);
                 break;
             case SHARE:
@@ -148,16 +146,6 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 addNewLink();
                 //showAddPopup();
                 break;
-            case (R.id.add_link_addresses):
-                Intent i = new Intent(getActivity(),ContactsActivity.class);
-                startActivityForResult(i, LINK_CONTACTS_REQUEST_CODE);
-                break;
-            case (R.id.image_from_gallery):
-                intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, LINK_IMAGE_FROM_GALLERY_REQUEST_CODE);
-                break;
             default:
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown click id: " + id, Toast.LENGTH_SHORT).show();
         }
@@ -165,57 +153,14 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
 
     private void addNewLink(){
         String newLinkId = Links.getNewLinkID();
-        LinkItemAction linkItemAction = new LinkItemAction(newLinkId, Links.ITEM_ACTION.ADD_NEW_LINK, Links.ITEM_TYPE.OUT_BOX);
+        LinkItemAction linkItemAction = new LinkItemAction(newLinkId, Links.LINK_ACTION.ADD_NEW_LINK, Links.LINK_TYPE.OUT);
         String title = getResources().getString(R.string.Add_new_link) + ": " + newLinkId + " ?";
         yesNoDialog(linkItemAction, title);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        Context context = getActivity().getApplicationContext();
-        switch (requestCode) {
-            case LINK_CONTACTS_REQUEST_CODE:
-                if( intent == null ){ return; }
-                createLinkContacts(intent);
-                break;
-            case LINK_IMAGE_FROM_GALLERY_REQUEST_CODE:
-                if( intent == null ){ return; }
-                createLinkFromImage(context,intent);
-                break;
-            default:
-                Toast.makeText(context, "Unknown REQEST CODE: " + requestCode, Toast.LENGTH_SHORT).show();
-        }
-    }
 
-    private void createLinkFromImage(Context context, Intent intent){
-        File file = Utils.getFile4Image(getActivity().getApplicationContext(), intent);
-        if( file == null ){ return ; }
 
-        LinkItemAction linkItemAction = MediaUtils.createLinkFromImage(context,file);
-        if( linkItemAction != null ){
-            String metaString = MetaItem.makeMetaString(MetaItem.TYPE.PICTURE, linkItemAction.mFileName, "");
-            String metaPath = MetaFile.setMeta(context, Links.ITEM_TYPE.OUT_BOX, linkItemAction.mID, metaString);
-            metaString = MetaItem.makeMetaString(MetaItem.TYPE.AWSYNCHRONIZED, String.valueOf(false));
-            metaPath = MetaFile.setMeta(context, Links.ITEM_TYPE.OUT_BOX,linkItemAction.mID,metaString);
-        }
-        refresh_list_adapter();
-    }
 
-    private void createLinkContacts(Intent data) {
-        if( data.hasExtra(ContactsActivity.EXTRA_CONTACTS_KEY) ){
-            Context context = getActivity().getApplicationContext();
-            HashMap<String,Contact> contacts = (HashMap<String,Contact>) data.getSerializableExtra(ContactsActivity.EXTRA_CONTACTS_KEY);
-            LinkItemAction linkItemAction = VCard.toFile(context, contacts);
-            if( linkItemAction != null ){ // ... if no errors!
-                String metaString = MetaItem.makeMetaString(MetaItem.TYPE.CONTACTS, linkItemAction.mFileName, String.valueOf(contacts.size()));
-                String metaPath = MetaFile.setMeta(context, Links.ITEM_TYPE.OUT_BOX, linkItemAction.mID, metaString);
-                metaString = MetaItem.makeMetaString(MetaItem.TYPE.AWSYNCHRONIZED, String.valueOf(false));
-                metaPath = MetaFile.setMeta(context, Links.ITEM_TYPE.OUT_BOX,linkItemAction.mID,metaString);
-            }
-            refresh_list_adapter();
-        }
-    }
 
     public void showAddPopup(){
         View view = getActivity().findViewById(R.id.add_link_btn);

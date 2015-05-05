@@ -21,15 +21,14 @@ import java.util.Map;
 public class VCard {
     private static final String TAG = "VCard";
 
-    public static LinkItemAction toFile(Context context, Map<String, Contact> contacts){
+    public static LinkItemAction toFile(Context context, Map<String, Contact> contacts, String linkId){
         if( contacts == null || contacts.size() == 0 ){
             Log.w(TAG, "No contacts to save!");
             return(null);
         }
-        String newLinkId = Links.getNewLinkID();
-        LinkItemAction linkItemAction = new LinkItemAction(newLinkId);
+        LinkItemAction linkItemAction = new LinkItemAction(linkId);
         try {
-            File file = Links.getNewVCardFilePath(context, newLinkId);
+            File file = Links.getNewVCardFilePath(context, linkId);
             Log.d(TAG, "New VCF file: " + file.getAbsolutePath());
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             for (String key : contacts.keySet()) {

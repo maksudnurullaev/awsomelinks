@@ -26,9 +26,9 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
 
     Context mContext = null;
     Fragment mFragment = null;
-    Links.ITEM_TYPE mItemsType = null;
+    Links.LINK_TYPE mItemsType = null;
 
-    public LinksDirAdapter(Context context, int resourceId, Fragment fragment, Links.ITEM_TYPE itemsType){
+    public LinksDirAdapter(Context context, int resourceId, Fragment fragment, Links.LINK_TYPE itemsType){
         super(context,resourceId);
         this.mItemsType = itemsType;
         addAll(Links.getLinkIDs(context, itemsType));
@@ -40,10 +40,10 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
     public View getView(int position, View convertView, ViewGroup parent) {
         String id = getItem(position);
         if( convertView == null ){
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.link_item_list_row,parent,false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.link_row,parent,false);
         }
         // set ID as title text
-        TextView tvID = (TextView)convertView.findViewById(R.id.textID);
+        TextView tvID = (TextView)convertView.findViewById(R.id.textViewFileName);
         tvID.setText(id);
         // set description text
         TextView tvDesc = (TextView)convertView.findViewById(R.id.textDesc);
@@ -53,9 +53,9 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
             if( metaItems != null && metaItems.size() > 0 ){
                 tvDesc.setText(MetaFile.getMetaDescription(mContext, metaItems));
                 if (MetaFile.isAWSynchonized(mContext, mItemsType, id)) {
-                    setUpButtonActions(convertView, id, R.id.button_share, Links.ITEM_ACTION.SHARE, mItemsType);
+                    setUpButtonActions(convertView, id, R.id.button_share, Links.LINK_ACTION.SHARE, mItemsType);
                 } else {
-                    setUpButtonActions(convertView, id, R.id.button_share, Links.ITEM_ACTION.AWSYNC, mItemsType, mContext.getString(R.string.Synchronize));
+                    setUpButtonActions(convertView, id, R.id.button_share, Links.LINK_ACTION.AWSYNC, mItemsType, mContext.getString(R.string.Synchronize));
                 }
                 setButtonsVisibility(convertView, View.VISIBLE, R.id.button_more, R.id.button_share);
             } else {
@@ -63,12 +63,12 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
                 setButtonsVisibility(convertView, View.VISIBLE, R.id.button_more);
                 setButtonsVisibility(convertView, View.INVISIBLE, R.id.button_share);
             }
-            setUpButtonActions(convertView, id, R.id.button_more, Links.ITEM_ACTION.MORE, mItemsType);
+            setUpButtonActions(convertView, id, R.id.button_more, Links.LINK_ACTION.MORE, mItemsType);
         } else {
             tvDesc.setText(R.string.Error);
             setButtonsVisibility(convertView, View.INVISIBLE, R.id.button_more, R.id.button_share);
         }
-        setUpButtonActions(convertView, id, R.id.button_delete, Links.ITEM_ACTION.DELETE, mItemsType);
+        setUpButtonActions(convertView, id, R.id.button_delete, Links.LINK_ACTION.DELETE, mItemsType);
         return convertView;
     }
 
@@ -79,11 +79,11 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
         }
     }
 
-    private void setUpButtonActions(View parentItemRow,String id,int viewId, Links.ITEM_ACTION linkItemAction, Links.ITEM_TYPE linkItemType){
+    private void setUpButtonActions(View parentItemRow,String id,int viewId, Links.LINK_ACTION linkItemAction, Links.LINK_TYPE linkItemType){
         setUpButtonActions(parentItemRow,id,viewId,linkItemAction,linkItemType,null);
     }
 
-    private void setUpButtonActions(View parentItemRow,String id,int viewId, Links.ITEM_ACTION linkItemAction, Links.ITEM_TYPE linkItemType, String text){
+    private void setUpButtonActions(View parentItemRow,String id,int viewId, Links.LINK_ACTION linkItemAction, Links.LINK_TYPE linkItemType, String text){
         Button view = (Button)parentItemRow.findViewById(viewId);
         if( view != null && mFragment != null && mFragment instanceof View.OnClickListener){
             view.setOnClickListener((View.OnClickListener) mFragment);

@@ -3,8 +3,6 @@ package com.awsomelink.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.awsomelink.R;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,7 +21,7 @@ public class MetaFile {
     public static final String TAG = "MetaFile";
     public static final String FILE_NAME = "META.TXT";
 
-    public static boolean addEmptyMeta(Context context, Links.ITEM_TYPE itemType, String linkId){
+    public static boolean addEmptyMeta(Context context, Links.LINK_TYPE itemType, String linkId){
         try{
             File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
             if( !file.exists() ) {
@@ -36,7 +34,7 @@ public class MetaFile {
         return(false);
     }
 
-    public static String setMeta(Context context, Links.ITEM_TYPE itemType, String linkId, String metaString){
+    public static String setMeta(Context context, Links.LINK_TYPE itemType, String linkId, String metaString){
         try{
             File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
             List<MetaItem> metaItems = null;
@@ -58,7 +56,7 @@ public class MetaFile {
         }
     }
 
-    public static String setMeta(Context context, Links.ITEM_TYPE itemType, String linkId, List<MetaItem> metaItems){
+    public static String setMeta(Context context, Links.LINK_TYPE itemType, String linkId, List<MetaItem> metaItems){
         try{
             File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
@@ -118,7 +116,7 @@ public class MetaFile {
         return(resultString);
     }
 
-    public static File getMetaFile(Context context, Links.ITEM_TYPE itemType, String linkId){
+    public static File getMetaFile(Context context, Links.LINK_TYPE itemType, String linkId){
         return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME));
     }
 
@@ -141,7 +139,7 @@ public class MetaFile {
         }
     }
 
-    public static boolean isAWSynchonized(Context context, Links.ITEM_TYPE itemType, String linkId){
+    public static boolean isAWSynchonized(Context context, Links.LINK_TYPE itemType, String linkId){
         List<MetaItem> metaItems = getMeta(getMetaFile(context, itemType,linkId));
         MetaItem metaItem = getMetaItem(metaItems,MetaItem.TYPE.AWSYNCHRONIZED);
         if( metaItem == null ){ return(false); }

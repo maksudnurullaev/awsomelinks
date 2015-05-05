@@ -19,17 +19,13 @@ import java.io.OutputStream;
 public class MediaUtils {
     public static final String TAG = "MediaFiles";
 
-    public static LinkItemAction createLinkFromImage(Context context, File file){
+    public static LinkItemAction createLinkFromImage(Context context, File file, String linkId){
         // 1. new link id
-        String newLinkId = Links.getNewLinkID();
-        LinkItemAction linkItemAction = new LinkItemAction(newLinkId);
+        LinkItemAction linkItemAction = new LinkItemAction(linkId);
         linkItemAction.mFileName = file.getName();
         // 2. make folder for new link id
-        File newLinkDir = new File(context.getFilesDir(),Links.mkpath(Links.OUT_FOLDER, newLinkId));
-        newLinkDir.mkdirs();
-        // copy file to new place
-        File dstFile = new File(context.getFilesDir(),Links.mkpath(Links.OUT_FOLDER,newLinkId,file.getName()));
-
+        File dstFile = new File(context.getFilesDir(),Links.mkpath(Links.OUT_FOLDER,linkId,Links.FILES_FOLDER,file.getName()));
+        dstFile.mkdirs();
         try {
             InputStream in = null;
             OutputStream out = null;

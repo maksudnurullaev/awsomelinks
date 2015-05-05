@@ -1,15 +1,11 @@
 package com.awsomelink.utils;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Environment;
-import android.util.Log;
 
 import com.awsomelink.base.LinkItemAction;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +16,15 @@ import java.util.UUID;
 public class Links {
     public static final String TAG = "Links";
 
-    public enum ITEM_TYPE {OUT_BOX, IN_BOX};
-    public enum ITEM_ACTION {DELETE, MORE, SHARE, AWSYNC, ADD_NEW_LINK};
+    public enum LINK_TYPE {OUT, IN};
+    public enum LINK_ACTION {DELETE, MORE, SHARE, AWSYNC, ADD_NEW_LINK};
 
     public static final String OUT_FOLDER = "OUT";
     public static final String IN_FOLDER = "IN";
+    public static final String FILES_FOLDER = "FILES";
 
-    public static final String LINK_ID = "LINK_ID";
+    public static final String LINK_ID_KEY = "LINK_ID";
+    public static final String LINK_TYPE_KEY = "LINK_TYPE";
 
     public static String getNewLinkID(){
         // TODO may be needs to replace something else...
@@ -42,7 +40,7 @@ public class Links {
         return(result);
     }
 
-    public static String[] getLinkIDs(Context context, ITEM_TYPE itemType){
+    public static String[] getLinkIDs(Context context, LINK_TYPE itemType){
         File dir = getFolder(context, itemType);
         List<String> IDs = new ArrayList<>();
         File[] listOfFiles = dir.listFiles();
@@ -54,30 +52,30 @@ public class Links {
         return(IDs.toArray(new String[IDs.size()]));
     }
 
-    public static File getFolder(Context context, ITEM_TYPE itemType){
-        File file = new File(context.getFilesDir(), (itemType == ITEM_TYPE.IN_BOX ? IN_FOLDER : OUT_FOLDER));
+    public static File getFolder(Context context, LINK_TYPE itemType){
+        File file = new File(context.getFilesDir(), (itemType == LINK_TYPE.IN ? IN_FOLDER : OUT_FOLDER));
         return(file);
     }
 
-    public static File getFolderLink(Context context, ITEM_TYPE itemType, String linkId){
-        File file = new File(context.getFilesDir(), mkpath((itemType == ITEM_TYPE.IN_BOX ? IN_FOLDER : OUT_FOLDER), linkId));
+    public static File getFolderLink(Context context, LINK_TYPE itemType, String linkId){
+        File file = new File(context.getFilesDir(), mkpath((itemType == LINK_TYPE.IN ? IN_FOLDER : OUT_FOLDER), linkId));
         return(file);
     }
 
-    public static File getFolderLinkFile(Context context, ITEM_TYPE itemType, String linkId, String fileName){
-        String itemTypeStr = (itemType == ITEM_TYPE.IN_BOX ? IN_FOLDER : OUT_FOLDER);
+    public static File getFolderLinkFile(Context context, LINK_TYPE itemType, String linkId, String fileName){
+        String itemTypeStr = (itemType == LINK_TYPE.IN ? IN_FOLDER : OUT_FOLDER);
         File file = new File( context.getFilesDir(), mkpath( itemTypeStr, linkId, fileName ) );
         return(file);
     }
 
     public static File addNewLink(Context context, String linkId){
-        File file = new File(context.getFilesDir(), mkpath(OUT_FOLDER, linkId));
-        file.mkdir();
+        File file = new File(context.getFilesDir(), mkpath(OUT_FOLDER, linkId, FILES_FOLDER));
+        file.mkdirs();
         return(file);
     }
 
     public static File getNewVCardFilePath(Context context, String linkId){
-        File file = new File(context.getFilesDir(), mkpath(OUT_FOLDER, linkId, getNewLinkID()) + ".vcf");
+        File file = new File(context.getFilesDir(), mkpath(OUT_FOLDER, linkId, FILES_FOLDER, getNewLinkID()) + ".vcf");
         file.getParentFile().mkdirs();
         return(file);
     }
