@@ -1,12 +1,14 @@
 package com.awsomelink.utils;
 
+import android.text.TextUtils;
+
 import com.awsomelink.R;
 
 /**
  * Created by m.nurullayev on 23.04.2015.
  */
 public class MetaItem {
-    public static enum TYPE {PASSWORD, FILE, CONTACTS, PICTURE, VIDEO, UNKNOWN, AWSYNCHRONIZED};
+    public static enum TYPE {PASSWORD, FILE, CONTACTS, PICTURE, VIDEO, UNKNOWN, AWSYNCHRONIZED, DESCRIPTION};
     public static final String DELIMTER = ":";
     public TYPE mType = TYPE.UNKNOWN;
     public String content;
@@ -46,24 +48,16 @@ public class MetaItem {
 
 
     public static TYPE getType(String type){
-        if( type == null || type.isEmpty() ){ return(TYPE.UNKNOWN);}
-        if( type.equals("PASSWORD") ) { return(TYPE.PASSWORD); }
-        if( type.equals("FILE") ) { return(TYPE.FILE); }
-        if( type.equals("CONTACTS") ) { return(TYPE.CONTACTS); }
-        if( type.equals("PICTURE") ) { return(TYPE.PICTURE); }
-        if( type.equals("VIDEO") ) { return(TYPE.VIDEO); }
-        if( type.equals("AWSYNCHRONIZED") ) { return(TYPE.AWSYNCHRONIZED); }
+        if(TextUtils.isEmpty(type)){ return(TYPE.UNKNOWN);}
+        type = type.toUpperCase();
+        for(TYPE t: TYPE.values() ){
+            if( t.toString().equals(type) ) return t;
+        }
         return(TYPE.UNKNOWN);
     }
 
     public static String getType(TYPE type){
-        if( type == TYPE.PASSWORD ) { return("PASSWORD"); }
-        if( type == TYPE.FILE ) { return("FILE"); }
-        if( type == TYPE.CONTACTS ) { return("CONTACTS"); }
-        if( type == TYPE.PICTURE ) { return("PICTURE"); }
-        if( type == TYPE.VIDEO ) { return("VIDEO"); }
-        if( type == TYPE.AWSYNCHRONIZED ) { return("AWSYNCHRONIZED"); }
-        return("UNKNOWN");
+        return( type == null ? TYPE.UNKNOWN.toString() : type.toString() );
     }
 
     public static String makeMetaString(TYPE type, String... strings){

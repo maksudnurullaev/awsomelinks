@@ -37,5 +37,6 @@
     <string name="title_activity_link">Link</string>
     <string name="hello_world">Hello world!</string>
     <string name="Description">Desription</string>
-    <string name="Password_Optional">Password(Optional)</string>
+    <string name="Password_Optional">Password (optional)</string>
+    <string name="Password">Password</string>
 </resources>

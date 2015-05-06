@@ -18,19 +18,11 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.awsomelink.base.Contact;
 import com.awsomelink.base.LinkItemAction;
-import com.awsomelink.db.adapters.LinksDirAdapter;
+import com.awsomelink.db.adapters.LinksAdapter;
 import com.awsomelink.utils.AWSyncTask;
 import com.awsomelink.utils.Links;
-import com.awsomelink.utils.MediaUtils;
 import com.awsomelink.utils.MetaFile;
-import com.awsomelink.utils.MetaItem;
-import com.awsomelink.utils.Utils;
-import com.awsomelink.utils.VCard;
-
-import java.io.File;
-import java.util.HashMap;
 
 /**
  * Created by m.nurullayev on 03.03.2015.
@@ -39,13 +31,12 @@ import java.util.HashMap;
 public class OutboxFragment extends Fragment implements MainActivity.ContentFragment, View.OnClickListener, RefreshableFragment {
     public static final String TAG = "OutboxFragment";
 
-    private LinksDirAdapter linksDirAdapter = null;
+    private LinksAdapter linksDirAdapter = null;
     public static final int LINK_REQUEST_CODE = 1005;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //ListView lv = (ListView) getActivity().findViewById(android.R.id.list);
         refresh_list_adapter();
     }
 
@@ -56,7 +47,7 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
             TextView textEmpty = (TextView) getActivity().findViewById(R.id.textViewEmpty);
             if( textEmpty != null){ lv.setEmptyView(textEmpty); }
 
-            linksDirAdapter = new LinksDirAdapter(getActivity().getApplicationContext(), 0, (Fragment)this, Links.LINK_TYPE.OUT);
+            linksDirAdapter = new LinksAdapter(getActivity().getApplicationContext(), 0, (Fragment)this, Links.LINK_TYPE.OUT);
             lv.setAdapter(linksDirAdapter);
         }
     }
@@ -135,6 +126,18 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Context context = getActivity().getApplicationContext();
+        switch (requestCode) {
+            case LINK_REQUEST_CODE:
+                refresh_list_adapter();
+                break;
+            default:
+                Toast.makeText(context, "Unknown REQEST CODE: " + requestCode, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
     public void clickDispatcher(View view) {
         click4Id(view.getId());
     }
@@ -143,24 +146,15 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
         Intent intent;
         switch (id) {
             case (R.id.add_link_btn):
-                addNewLink();
-                //showAddPopup();
+                String newLinkId = Links.getNewLinkID();
+                LinkItemAction linkItemAction = new LinkItemAction(newLinkId, Links.LINK_ACTION.ADD_NEW_LINK, Links.LINK_TYPE.OUT);
+                String title = getResources().getString(R.string.Add_new_link) + ": " + newLinkId + " ?";
+                yesNoDialog(linkItemAction, title);
                 break;
             default:
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown click id: " + id, Toast.LENGTH_SHORT).show();
         }
     }
-
-    private void addNewLink(){
-        String newLinkId = Links.getNewLinkID();
-        LinkItemAction linkItemAction = new LinkItemAction(newLinkId, Links.LINK_ACTION.ADD_NEW_LINK, Links.LINK_TYPE.OUT);
-        String title = getResources().getString(R.string.Add_new_link) + ": " + newLinkId + " ?";
-        yesNoDialog(linkItemAction, title);
-    }
-
-
-
-
 
     public void showAddPopup(){
         View view = getActivity().findViewById(R.id.add_link_btn);

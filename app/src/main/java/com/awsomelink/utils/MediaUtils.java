@@ -25,6 +25,11 @@ public class MediaUtils {
         linkItemAction.mFileName = file.getName();
         // 2. make folder for new link id
         File dstFile = new File(context.getFilesDir(),Links.mkpath(Links.OUT_FOLDER,linkId,Links.FILES_FOLDER,file.getName()));
+        copyFile(file, dstFile);
+        return linkItemAction;
+    }
+
+    private static void copyFile(File file, File dstFile) {
         dstFile.mkdirs();
         try {
             InputStream in = null;
@@ -46,11 +51,8 @@ public class MediaUtils {
             out = null;
         } catch (FileNotFoundException ex){
             Log.e(TAG, ex.getMessage());
-            return(null);
         } catch (Exception ex){
             Log.e(TAG, ex.getMessage());
-            return(null);
         }
-        return(linkItemAction);
     }
 }

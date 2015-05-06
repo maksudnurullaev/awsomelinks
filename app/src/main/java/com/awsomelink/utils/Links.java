@@ -52,6 +52,16 @@ public class Links {
         return(IDs.toArray(new String[IDs.size()]));
     }
 
+    public static String[] getLinkFiles(Context context, LINK_TYPE itemType, String linkId){
+        File dir = getFolderLinkFile(context, itemType, linkId, FILES_FOLDER);
+        List<String> files = new ArrayList<>();
+        File[] listOfFiles = dir.listFiles();
+        for (int i = 0; i < listOfFiles.length; i++) {
+            files.add(listOfFiles[i].getName());
+        }
+        return(files.toArray(new String[files.size()]));
+    }
+
     public static File getFolder(Context context, LINK_TYPE itemType){
         File file = new File(context.getFilesDir(), (itemType == LINK_TYPE.IN ? IN_FOLDER : OUT_FOLDER));
         return(file);

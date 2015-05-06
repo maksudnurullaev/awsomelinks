@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.awsomelink.db.adapters.LinksDirAdapter;
+import com.awsomelink.db.adapters.LinkFilesAdapter;
 import com.awsomelink.dummy.DummyContent;
 import com.awsomelink.utils.Links;
 
@@ -21,22 +21,28 @@ import com.awsomelink.utils.Links;
 
 public class LinkFilesFragment extends Fragment implements RefreshableFragment {
     public static final String TAG = "LinkFilesFragment";
+
     public static final int LINK_CONTACTS_REQUEST_CODE = 1001;
     public static final int LINK_FILE_REQUEST_CODE = 1002;
     public static final int LINK_IMAGE_FROM_GALLERY_REQUEST_CODE = 1003;
     public static final int LINK_IMAGE_FROM_CAMERA_REQUEST_CODE = 1004;
     public static final int LINK_REQUEST_CODE = 1005;
-    private LinksDirAdapter linksDirAdapter = null;
+
+    public static final String ARG_LINK_ID = "LINK_ID";
+    public static final String ARG_LINK_TYPE = "LINK_TYPE";
 
     private String mLinkId = null;
     private Links.LINK_TYPE mType = null;
+    private LinkFilesAdapter mLinkFilesAdapter = null;
 
     public LinkFilesFragment(){}
 
     public static LinkFilesFragment newInstance(String linkId, Links.LINK_TYPE itemType) {
         LinkFilesFragment fragment = new LinkFilesFragment();
-        fragment.setLinkId(linkId);
-        fragment.setType(itemType);
+        Bundle args = new Bundle();
+        args.putString(ARG_LINK_ID, linkId);
+        args.putSerializable(ARG_LINK_TYPE, itemType);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -67,7 +73,13 @@ public class LinkFilesFragment extends Fragment implements RefreshableFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "Argument setted up!");
+        if (getArguments() != null) {
+            mLinkId = getArguments().getString(ARG_LINK_ID);
+            mType = (Links.LINK_TYPE)getArguments().getSerializable(ARG_LINK_TYPE);
+            Log.d(TAG, "Argument setted up!");
+        } else {
+            Log.e(TAG, "Fragment initial arguments are invalid!");
+        }
     }
 
     @Override
@@ -90,11 +102,8 @@ public class LinkFilesFragment extends Fragment implements RefreshableFragment {
         if( lv != null ) {
             TextView textEmpty = (TextView) getActivity().findViewById(R.id.textViewEmpty);
             if( textEmpty != null){ lv.setEmptyView(textEmpty); }
-
-            //linksDirAdapter = new LinksDirAdapter(getActivity().getApplicationContext(), 0, (Fragment)this, Links.LINK_TYPE.OUT);
-            //lv.setAdapter(linksDirAdapter);
-            lv.setAdapter(new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                    android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS));
+            mLinkFilesAdapter = new LinkFilesAdapter(getActivity().getApplicationContext(), 0, (Fragment)this, mType, mLinkId);
+            lv.setAdapter(mLinkFilesAdapter);
         }
     }
 

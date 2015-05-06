@@ -1,6 +1,7 @@
 package com.awsomelink.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -34,7 +35,7 @@ public class MetaFile {
         return(false);
     }
 
-    public static String setMeta(Context context, Links.LINK_TYPE itemType, String linkId, String metaString){
+    public static String setMeta(Context context, Links.LINK_TYPE itemType, String linkId, String metaString, boolean update){
         try{
             File file = Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME);
             List<MetaItem> metaItems = null;
@@ -42,8 +43,12 @@ public class MetaFile {
                 metaItems = MetaFile.getMeta(file);
             }
             if (metaItems != null && metaItems.size() > 0) {
-                MetaItem metaItem = MetaItem.string2Meta(metaString);
-                setMeta(context, itemType, linkId, addOrReplace(metaItems, metaItem));
+                if( update ) {
+                    setMeta(context, itemType, linkId, updateMeta(metaItems,MetaItem.string2Meta(metaString)));
+                } else {
+                    metaItems.add(MetaItem.string2Meta(metaString));
+                    setMeta(context, itemType, linkId, metaItems);
+                }
             } else {
                 PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
                 pw.println(metaString);
@@ -71,19 +76,32 @@ public class MetaFile {
         }
     }
 
-    public static List<MetaItem> addOrReplace(List<MetaItem> metaItems, MetaItem metaItem){
-        boolean alreadyExist = false;
+    public static List<MetaItem> updateMeta(List<MetaItem> metaItems, MetaItem metaItem){
+        boolean updated = false;
         List<MetaItem> result = new ArrayList<>();
         for(MetaItem mi:metaItems){
-            if( !alreadyExist && mi.mType == metaItem.mType ){
-                alreadyExist = true;
+            if( !updated && mi.mType == metaItem.mType ){
+                updated = true;
                 result.add(metaItem);
             } else {
                 result.add(mi);
             }
         }
-        if( !alreadyExist ) { result.add(metaItem); }
+        if( !updated ) { result.add(metaItem); }
         return(result);
+    }
+
+    public static boolean hasValidData(List<MetaItem> metaItems){
+        for(MetaItem metaItem: metaItems){
+            switch (metaItem.mType){
+                case CONTACTS:
+                case FILE:
+                case PICTURE:
+                case VIDEO:
+                    return true;
+            }
+        }
+        return false;
     }
 
     public static String getMetaDescription(Context context, List<MetaItem> metaItems){
@@ -97,6 +115,9 @@ public class MetaFile {
                     } else {
                         result.put(metaItem.mType, Integer.valueOf(metaItem.description));
                     }
+                    break;
+                case PASSWORD:    // ignoring
+                case DESCRIPTION: // ignoring
                     break;
                 default:
                     if( metaItem.mType == MetaItem.TYPE.PASSWORD ||  metaItem.mType == MetaItem.TYPE.AWSYNCHRONIZED ) break;
@@ -113,11 +134,29 @@ public class MetaFile {
             resultString += context.getString(MetaItem.getI18NId(type)) + "(" + result.get(type) + ")" ;
         }
         Log.d(TAG, "Meta description string: " + resultString);
-        return(resultString);
+        return(TextUtils.isEmpty(resultString) ? "-:-" : resultString );
+    }
+
+    public static String getMetaContent(List<MetaItem> metaItems, MetaItem.TYPE mType){
+        for(MetaItem mi:metaItems){
+            if(mi.mType == mType){
+                return(mi.content);
+            }
+        }
+        return(null);
+    }
+
+    public static void setMetaAwsync(Context context, String linkId, boolean value){
+        String metaString = MetaItem.makeMetaString(MetaItem.TYPE.AWSYNCHRONIZED, String.valueOf(value));
+        setMeta(context, Links.LINK_TYPE.OUT, linkId, metaString, true);
     }
 
     public static File getMetaFile(Context context, Links.LINK_TYPE itemType, String linkId){
         return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME));
+    }
+
+    public static List<MetaItem> getMeta(Context context, Links.LINK_TYPE itemType, String linkId){
+        return(getMeta(getMetaFile(context,itemType,linkId)));
     }
 
     public static List<MetaItem> getMeta(File file){

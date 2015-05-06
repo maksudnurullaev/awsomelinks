@@ -57,7 +57,7 @@ public class AWSyncTask extends AsyncTask<LinkItemAction, Integer, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         String metaString = MetaItem.makeMetaString(MetaItem.TYPE.AWSYNCHRONIZED, String.valueOf(mResult));
-        MetaFile.setMeta(mContext, Links.LINK_TYPE.OUT,mLinkItemAction.mID,metaString);
+        MetaFile.setMeta(mContext, Links.LINK_TYPE.OUT,mLinkItemAction.mID,metaString,true);
         mRefreshableFragment.refresh_list_adapter();
     }
 }

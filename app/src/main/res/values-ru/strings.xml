@@ -35,5 +35,6 @@
     <string name="All_new_link">Добавить новую ссылку</string>
     <string name="Link">Ссылка</string>
     <string name="Description">Описание</string>
-    <string name="Password_Optional">Пароль(не обязательно)</string>
+    <string name="Password_Optional">Пароль (не обязательно)</string>
+    <string name="Password">Пароль</string>
 </resources>

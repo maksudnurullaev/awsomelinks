@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,10 +26,11 @@ import com.awsomelink.utils.VCard;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class LinkActivity extends ActionBarActivity {
-    public static final String TAG = "LinkActiviry";
+    public static final String TAG = "LinkActivity";
     private String mLinkId = null;
     private Links.LINK_TYPE mType = null;
     private RefreshableFragment mFilesFragment = null;
@@ -36,6 +40,8 @@ public class LinkActivity extends ActionBarActivity {
     public static final int LINK_IMAGE_FROM_GALLERY_REQUEST_CODE = 1003;
     public static final int LINK_IMAGE_FROM_CAMERA_REQUEST_CODE = 1004;
 
+    private String mTempOldValue = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +50,50 @@ public class LinkActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             setUpFilesFragment();
         }
+        List<MetaItem> metaItems = MetaFile.getMeta(getApplication(),mType,mLinkId);
+        setUpMetaEditText(metaItems, R.id.editTextDesciption, MetaItem.TYPE.DESCRIPTION);
+        setUpMetaEditText(metaItems, R.id.editTextPassword, MetaItem.TYPE.PASSWORD);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        boolean result1 = checkUpMetaEditTextUpdate(R.id.editTextDesciption, MetaItem.TYPE.DESCRIPTION);
+        boolean result2 = checkUpMetaEditTextUpdate(R.id.editTextPassword, MetaItem.TYPE.PASSWORD);
+        if( result1 || result2 ){ MetaFile.setMetaAwsync(getApplicationContext(),mLinkId,false); }
+    }
+
+    private void setUpMetaEditText(List<MetaItem> metaItems, int id, MetaItem.TYPE type){
+        String content = MetaFile.getMetaContent(metaItems, type);
+        if( !TextUtils.isEmpty(content) ) {
+            EditText et = (EditText) findViewById(id);
+            et.setText(content);
+            et.setTag(content);
+        }
+    }
+
+    private boolean checkUpMetaEditTextUpdate( int id, MetaItem.TYPE metaType){
+        EditText et = (EditText) findViewById(id);
+        String oldValue = (String)et.getTag();
+        String newValue = et.getText().toString();
+        if (TextUtils.isEmpty(oldValue)) {
+            if (!TextUtils.isEmpty(newValue)) {
+                updateMeta(metaType, newValue);
+                return true;
+            }
+        } else {
+            if (!oldValue.equals(newValue)) {
+                updateMeta(metaType, newValue);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateMeta(MetaItem.TYPE mMetaType, String newValue){
+        Log.d(TAG, "Update " + mMetaType.toString() + " to " + newValue);
+        String metaString = MetaItem.makeMetaString(mMetaType, newValue);
+        String metaPath = MetaFile.setMeta(getApplicationContext(), mType, mLinkId, metaString, true);
     }
 
     private void setUpFilesFragment() {
@@ -52,7 +102,7 @@ public class LinkActivity extends ActionBarActivity {
             return;
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.link_files_fragment_place, LinkFilesFragment.newInstance(mLinkId, mType));
+        ft.add(R.id.link_files_fragment_place, (Fragment)LinkFilesFragment.newInstance(mLinkId, mType));
         ft.commit();
     }
 
@@ -139,11 +189,10 @@ public class LinkActivity extends ActionBarActivity {
             LinkItemAction linkItemAction = VCard.toFile(context, contacts, mLinkId);
             if( linkItemAction != null ){ // ... if no errors!
                 String metaString = MetaItem.makeMetaString(MetaItem.TYPE.CONTACTS, linkItemAction.mFileName, String.valueOf(contacts.size()));
-                String metaPath = MetaFile.setMeta(context, Links.LINK_TYPE.OUT, linkItemAction.mID, metaString);
-                metaString = MetaItem.makeMetaString(MetaItem.TYPE.AWSYNCHRONIZED, String.valueOf(false));
-                metaPath = MetaFile.setMeta(context, Links.LINK_TYPE.OUT,linkItemAction.mID,metaString);
+                String metaPath = MetaFile.setMeta(context, Links.LINK_TYPE.OUT, linkItemAction.mID, metaString, false);
+                MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false);
             }
-            //refresh_list_adapter();
+            refresh_files_fragment();
         }
     }
 
@@ -154,11 +203,14 @@ public class LinkActivity extends ActionBarActivity {
         LinkItemAction linkItemAction = MediaUtils.createLinkFromImage(context, file, mLinkId);
         if( linkItemAction != null ){
             String metaString = MetaItem.makeMetaString(MetaItem.TYPE.PICTURE, linkItemAction.mFileName, "");
-            String metaPath = MetaFile.setMeta(context, Links.LINK_TYPE.OUT, linkItemAction.mID, metaString);
-            metaString = MetaItem.makeMetaString(MetaItem.TYPE.AWSYNCHRONIZED, String.valueOf(false));
-            metaPath = MetaFile.setMeta(context, Links.LINK_TYPE.OUT,linkItemAction.mID,metaString);
+            String metaPath = MetaFile.setMeta(context, mType, linkItemAction.mID, metaString, false);
+            MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false);
         }
-        //refresh_list_adapter();
+        refresh_files_fragment();
+    }
+
+    private void refresh_files_fragment(){
+        if( mFilesFragment  != null ) mFilesFragment.refresh_list_adapter();
     }
 
 }

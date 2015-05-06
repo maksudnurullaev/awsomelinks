@@ -2,6 +2,7 @@ package com.awsomelink.db.adapters;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,15 +22,15 @@ import java.util.List;
 /**
  * Created by m.nurullayev on 21.04.2015.
  */
-public class LinksDirAdapter extends ArrayAdapter<String> {
-    public static final String TAG = "LinksDirAdapter";
+public class LinksAdapter extends ArrayAdapter<String> {
+    public static final String TAG = "LinksAdapter";
 
     Context mContext = null;
     Fragment mFragment = null;
     Links.LINK_TYPE mItemsType = null;
 
-    public LinksDirAdapter(Context context, int resourceId, Fragment fragment, Links.LINK_TYPE itemsType){
-        super(context,resourceId);
+    public LinksAdapter(Context context, int resourceId, Fragment fragment, Links.LINK_TYPE itemsType){
+        super(context, resourceId);
         this.mItemsType = itemsType;
         addAll(Links.getLinkIDs(context, itemsType));
         mContext = context;
@@ -51,13 +52,22 @@ public class LinksDirAdapter extends ArrayAdapter<String> {
         if( metaFile.exists() ) {
             List<MetaItem> metaItems = MetaFile.getMeta(metaFile);
             if( metaItems != null && metaItems.size() > 0 ){
-                tvDesc.setText(MetaFile.getMetaDescription(mContext, metaItems));
-                if (MetaFile.isAWSynchonized(mContext, mItemsType, id)) {
-                    setUpButtonActions(convertView, id, R.id.button_share, Links.LINK_ACTION.SHARE, mItemsType);
+                // set description
+                String description = MetaFile.getMetaContent(metaItems, MetaItem.TYPE.DESCRIPTION);
+                if(TextUtils.isEmpty(description)){ description = MetaFile.getMetaDescription(mContext, metaItems); }
+                tvDesc.setText(description);
+                // set sync|share button
+                if( MetaFile.hasValidData(metaItems) ){
+                    if (MetaFile.isAWSynchonized(mContext, mItemsType, id)) {
+                        setUpButtonActions(convertView, id, R.id.button_share, Links.LINK_ACTION.SHARE, mItemsType);
+                    } else {
+                        setUpButtonActions(convertView, id, R.id.button_share, Links.LINK_ACTION.AWSYNC, mItemsType, mContext.getString(R.string.Synchronize));
+                    }
+                    setButtonsVisibility(convertView, View.VISIBLE, R.id.button_more, R.id.button_share);
                 } else {
-                    setUpButtonActions(convertView, id, R.id.button_share, Links.LINK_ACTION.AWSYNC, mItemsType, mContext.getString(R.string.Synchronize));
+                    setButtonsVisibility(convertView, View.INVISIBLE, R.id.button_share);
+                    setButtonsVisibility(convertView, View.VISIBLE, R.id.button_more);
                 }
-                setButtonsVisibility(convertView, View.VISIBLE, R.id.button_more, R.id.button_share);
             } else {
                 tvDesc.setText(R.string.empty);
                 setButtonsVisibility(convertView, View.VISIBLE, R.id.button_more);
