@@ -72,6 +72,18 @@ public class Links {
         return(file);
     }
 
+    public static File getFolderLinkFILES(Context context, LINK_TYPE itemType, String linkId){
+        String itemTypeStr = (itemType == LINK_TYPE.IN ? IN_FOLDER : OUT_FOLDER);
+        File file = new File( context.getFilesDir(), mkpath( itemTypeStr, linkId, FILES_FOLDER ) );
+        return(file);
+    }
+
+    public static File getFolderLinkFILESFile(Context context, LINK_TYPE itemType, String linkId, String fileName){
+        String itemTypeStr = (itemType == LINK_TYPE.IN ? IN_FOLDER : OUT_FOLDER);
+        File file = new File( context.getFilesDir(), mkpath( itemTypeStr, linkId, FILES_FOLDER, fileName ) );
+        return(file);
+    }
+
     public static File getFolderLinkFile(Context context, LINK_TYPE itemType, String linkId, String fileName){
         String itemTypeStr = (itemType == LINK_TYPE.IN ? IN_FOLDER : OUT_FOLDER);
         File file = new File( context.getFilesDir(), mkpath( itemTypeStr, linkId, fileName ) );
@@ -116,9 +128,11 @@ public class Links {
     }
 
     public static void deleteLinkItem(File folder){
-        for(File f: folder.listFiles()){
-            if( f.isDirectory() ) deleteLinkItem(f);
-            f.delete();
+        if( folder.listFiles() != null && folder.listFiles().length > 0 ) {
+            for (File f : folder.listFiles()) {
+                if (f.isDirectory()) deleteLinkItem(f);
+                f.delete();
+            }
         }
         folder.delete();
     }

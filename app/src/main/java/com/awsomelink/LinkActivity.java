@@ -41,6 +41,7 @@ public class LinkActivity extends ActionBarActivity {
     public static final int LINK_IMAGE_FROM_CAMERA_REQUEST_CODE = 1004;
 
     private String mTempOldValue = null;
+    private MenuItem mAddMenu = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,14 +133,13 @@ public class LinkActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_add_link, menu);
+        mAddMenu = menu.findItem(R.id.menu_add);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
         Intent intent;
-
         switch (item.getItemId()){
             case R.id.action_add_link_addresses:
                 intent = new Intent(this,ContactsActivity.class);
@@ -171,22 +171,22 @@ public class LinkActivity extends ActionBarActivity {
         switch (requestCode) {
             case LINK_CONTACTS_REQUEST_CODE:
                 if( intent == null ){ return; }
-                createLinkContacts(intent);
+                createLinkFileFromContacts(intent);
                 break;
             case LINK_IMAGE_FROM_GALLERY_REQUEST_CODE:
                 if( intent == null ){ return; }
-                createLinkFromImage(context, intent);
+                createLinkFileFromImage(context, intent);
                 break;
             default:
                 Toast.makeText(context, "Unknown REQEST CODE: " + requestCode, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void createLinkContacts(Intent data) {
+    private void createLinkFileFromContacts(Intent data) {
         if( data.hasExtra(ContactsActivity.EXTRA_CONTACTS_KEY) ){
             Context context = getApplicationContext();
             HashMap<String,Contact> contacts = (HashMap<String,Contact>) data.getSerializableExtra(ContactsActivity.EXTRA_CONTACTS_KEY);
-            LinkItemAction linkItemAction = VCard.toFile(context, contacts, mLinkId);
+            LinkItemAction linkItemAction = VCard.createLinkFileFromContacts(context, contacts, mLinkId);
             if( linkItemAction != null ){ // ... if no errors!
                 String metaString = MetaItem.makeMetaString(MetaItem.TYPE.CONTACTS, linkItemAction.mFileName, String.valueOf(contacts.size()));
                 String metaPath = MetaFile.setMeta(context, Links.LINK_TYPE.OUT, linkItemAction.mID, metaString, false);
@@ -196,11 +196,11 @@ public class LinkActivity extends ActionBarActivity {
         }
     }
 
-    private void createLinkFromImage(Context context, Intent intent){
+    private void createLinkFileFromImage(Context context, Intent intent){
         File file = Utils.getFile4Image(getApplicationContext(), intent);
         if( file == null ){ return ; }
 
-        LinkItemAction linkItemAction = MediaUtils.createLinkFromImage(context, file, mLinkId);
+        LinkItemAction linkItemAction = MediaUtils.createLinkFileFromImage(context, file, mLinkId);
         if( linkItemAction != null ){
             String metaString = MetaItem.makeMetaString(MetaItem.TYPE.PICTURE, linkItemAction.mFileName, "");
             String metaPath = MetaFile.setMeta(context, mType, linkItemAction.mID, metaString, false);
@@ -213,4 +213,7 @@ public class LinkActivity extends ActionBarActivity {
         if( mFilesFragment  != null ) mFilesFragment.refresh_list_adapter();
     }
 
+    public void clickAdd(View v){
+        openOptionsMenu();
+    }
 }

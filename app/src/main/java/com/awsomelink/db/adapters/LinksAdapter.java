@@ -101,6 +101,12 @@ public class LinksAdapter extends ArrayAdapter<String> {
             if( text != null ){
                 view.setText(text);
             }
+            //... setup long click to set awsync status to false
+            if( linkItemAction == Links.LINK_ACTION.SHARE){
+                view.setOnLongClickListener((View.OnLongClickListener) mFragment);
+            } else if( linkItemAction == Links.LINK_ACTION.AWSYNC ) {
+                view.setLongClickable(false);
+            }
         }
     }
 }

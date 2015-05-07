@@ -19,7 +19,7 @@ import java.io.OutputStream;
 public class MediaUtils {
     public static final String TAG = "MediaFiles";
 
-    public static LinkItemAction createLinkFromImage(Context context, File file, String linkId){
+    public static LinkItemAction createLinkFileFromImage(Context context, File file, String linkId){
         // 1. new link id
         LinkItemAction linkItemAction = new LinkItemAction(linkId);
         linkItemAction.mFileName = file.getName();
@@ -30,7 +30,8 @@ public class MediaUtils {
     }
 
     private static void copyFile(File file, File dstFile) {
-        dstFile.mkdirs();
+        if( !dstFile.getParentFile().exists() )
+            dstFile.getParentFile().mkdirs();
         try {
             InputStream in = null;
             OutputStream out = null;

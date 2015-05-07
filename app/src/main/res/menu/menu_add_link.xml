@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context="com.awsomelink.OutboxActivity">
-    <item android:id="@+id/dump" android:title="@string/Add"
+    <item android:id="@+id/menu_add" android:title="@string/Add"
         android:orderInCategory="100" app:showAsAction="never">
         <menu>
             <item android:id="@+id/action_add_link_addresses" android:title="@string/Addresses"

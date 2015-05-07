@@ -30,7 +30,7 @@ public class AWSyncTask extends AsyncTask<LinkItemAction, Integer, Void> {
     @Override
     protected Void doInBackground(LinkItemAction... params) {
         mLinkItemAction = params[0];
-        File folder = Links.getFolderLink(mContext, mLinkItemAction.mItemType, mLinkItemAction.mID);
+        File folder = Links.getFolderLinkFILES(mContext, mLinkItemAction.mItemType, mLinkItemAction.mID);
         Log.d(TAG, "Do AWSync for " + folder.getPath());
         String requestURL = "https://awsome.link/" + mLinkItemAction.mID + "/upload";
         Log.d(TAG, "Do AWSync URI:" + requestURL);

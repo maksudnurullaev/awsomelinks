@@ -28,7 +28,7 @@ import com.awsomelink.utils.MetaFile;
  * Created by m.nurullayev on 03.03.2015.
  */
 
-public class OutboxFragment extends Fragment implements MainActivity.ContentFragment, View.OnClickListener, RefreshableFragment {
+public class OutboxFragment extends Fragment implements MainActivity.ContentFragment, View.OnClickListener, View.OnLongClickListener, RefreshableFragment {
     public static final String TAG = "OutboxFragment";
 
     private LinksAdapter linksDirAdapter = null;
@@ -67,6 +67,17 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
         } else {
             clickDispatcher(v);
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        Object tag = v.getTag();
+        if (tag instanceof LinkItemAction) {
+            LinkItemAction la = (LinkItemAction) tag;
+            MetaFile.setMetaAwsync(getActivity().getApplicationContext(), la.mID, false);
+            refresh_list_adapter();
+        }
+        return true;
     }
 
     private void yesNoDialog(final LinkItemAction linkItemAction, final String title){
@@ -174,4 +185,6 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
     public MainActivity.ContentFragmentType getType() {
         return MainActivity.ContentFragmentType.OUTBOX;
     }
+
+
 }

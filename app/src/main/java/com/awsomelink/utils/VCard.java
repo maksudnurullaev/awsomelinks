@@ -21,7 +21,7 @@ import java.util.Map;
 public class VCard {
     private static final String TAG = "VCard";
 
-    public static LinkItemAction toFile(Context context, Map<String, Contact> contacts, String linkId){
+    public static LinkItemAction createLinkFileFromContacts(Context context, Map<String, Contact> contacts, String linkId){
         if( contacts == null || contacts.size() == 0 ){
             Log.w(TAG, "No contacts to save!");
             return(null);
