@@ -129,7 +129,6 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
                 v.setEnabled(false);
                 AWSyncTask task = new AWSyncTask(getActivity().getApplicationContext(),this);
                 task.execute(linkItemAction);
-                Toast.makeText(getActivity().getApplicationContext(), "Link AWSYNC action: " + linkItemAction.mID,Toast.LENGTH_SHORT ).show();
                 break;
             default:
                 Toast.makeText(getActivity().getApplicationContext(), "Unknown link item action",Toast.LENGTH_SHORT ).show();

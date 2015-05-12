@@ -2,7 +2,10 @@ package com.awsomelink;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -25,6 +28,8 @@ import com.awsomelink.utils.Utils;
 import com.awsomelink.utils.VCard;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,7 +43,10 @@ public class LinkActivity extends ActionBarActivity {
     public static final int LINK_CONTACTS_REQUEST_CODE = 1001;
     public static final int LINK_FILE_REQUEST_CODE = 1002;
     public static final int LINK_IMAGE_FROM_GALLERY_REQUEST_CODE = 1003;
-    public static final int LINK_IMAGE_FROM_CAMERA_REQUEST_CODE = 1004;
+    public static final int LINK_IMAGE_FROM_CAMERA_BIG_REQUEST_CODE = 1004;
+    public static final int LINK_IMAGE_FROM_CAMERA_SMALL_REQUEST_CODE = 1005;
+
+    private String mTempFilePath = null;
 
     private String mTempOldValue = null;
     private MenuItem mAddMenu = null;
@@ -51,7 +59,7 @@ public class LinkActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             setUpFilesFragment();
         }
-        List<MetaItem> metaItems = MetaFile.getMeta(getApplication(),mType,mLinkId);
+        List<MetaItem> metaItems = MetaFile.getMeta(getApplication(), mType, mLinkId);
         setUpMetaEditText(metaItems, R.id.editTextDesciption, MetaItem.TYPE.DESCRIPTION);
         setUpMetaEditText(metaItems, R.id.editTextPassword, MetaItem.TYPE.PASSWORD);
     }
@@ -61,7 +69,7 @@ public class LinkActivity extends ActionBarActivity {
         super.onBackPressed();
         boolean result1 = checkUpMetaEditTextUpdate(R.id.editTextDesciption, MetaItem.TYPE.DESCRIPTION);
         boolean result2 = checkUpMetaEditTextUpdate(R.id.editTextPassword, MetaItem.TYPE.PASSWORD);
-        if( result1 || result2 ){ MetaFile.setMetaAwsync(getApplicationContext(),mLinkId,false); }
+        if( result1 || result2 ){ MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false); }
     }
 
     private void setUpMetaEditText(List<MetaItem> metaItems, int id, MetaItem.TYPE type){
@@ -145,10 +153,26 @@ public class LinkActivity extends ActionBarActivity {
                 intent = new Intent(this,ContactsActivity.class);
                 startActivityForResult(intent, LINK_CONTACTS_REQUEST_CODE);
                 break;
-            case R.id.action_add_link_image_from_camera:
-                Toast.makeText(getApplicationContext(), "Non-handled add  image from camera action", Toast.LENGTH_SHORT).show();
+            case R.id.action_add_link_image_from_camera_big:
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    //startActivityForResult(takePictureIntent,  LINK_IMAGE_FROM_CAMERA_BIG_REQUEST_CODE);
+                    File file = MediaUtils.createNextLinkJpegBig();
+                    mTempFilePath = file.getAbsolutePath();
+                    Log.d(TAG, mTempFilePath);
+                    if( file != null ){
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+                        startActivityForResult(takePictureIntent, LINK_IMAGE_FROM_CAMERA_BIG_REQUEST_CODE);
+                    }
+                }
                 break;
-            case (R.id.action_add_link_image_from_gallery):
+            case R.id.action_add_link_image_from_camera_small:
+                takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, LINK_IMAGE_FROM_CAMERA_SMALL_REQUEST_CODE);
+                }
+                break;
+            case R.id.action_add_link_image_from_gallery:
                 intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -159,6 +183,11 @@ public class LinkActivity extends ActionBarActivity {
                 break;
             case R.id.action_add_link_video_from_gallery:
                 Toast.makeText(getApplicationContext(), "Non-handled add  video from gallery action", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_add_link_file:
+                intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("file/*");
+                startActivityForResult(intent, LINK_FILE_REQUEST_CODE);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -174,18 +203,78 @@ public class LinkActivity extends ActionBarActivity {
                 createLinkFileFromContacts(intent);
                 break;
             case LINK_IMAGE_FROM_GALLERY_REQUEST_CODE:
+                if ( intent == null ){ return; }
+                createLinkFileFromImage(intent);
+                break;
+            case LINK_IMAGE_FROM_CAMERA_SMALL_REQUEST_CODE:
+                if (intent == null ){ return; }
+                createLinkFileFromCameraImageSmall(intent);
+                break;
+            case LINK_IMAGE_FROM_CAMERA_BIG_REQUEST_CODE:
+                createLinkFileFromCameraImageBig();
+                break;
+            case LINK_FILE_REQUEST_CODE:
                 if( intent == null ){ return; }
-                createLinkFileFromImage(context, intent);
+                createLinkeFileFromFile(intent);
                 break;
             default:
                 Toast.makeText(context, "Unknown REQEST CODE: " + requestCode, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void createLinkFileFromContacts(Intent data) {
-        if( data.hasExtra(ContactsActivity.EXTRA_CONTACTS_KEY) ){
+    private void createLinkFileFromCameraImageSmall(Intent data){
+        Bundle extras = data.getExtras();
+        Bitmap imageBitmap = (Bitmap) extras.get("data");
+        LinkItemAction linkItemAction = MediaUtils.createLinkFileFromCameraImage(getApplicationContext(), mLinkId, imageBitmap);
+        if( linkItemAction != null ){
+            String metaString = MetaItem.makeMetaString(MetaItem.TYPE.PICTURE, linkItemAction.mFileName, "");
+            String metaPath = MetaFile.setMeta(getApplicationContext(), mType, linkItemAction.mID, metaString, false);
+            MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false);
+        }
+        refresh_files_fragment();
+    }
+
+    private void createLinkFileFromCameraImageBig(){
+        if( mTempFilePath == null ) return;
+        File file = new File(mTempFilePath);
+        LinkItemAction linkItemAction = null;
+        if( file.exists() ){
+            linkItemAction = MediaUtils.createLinkFileFromFile(getApplicationContext(), mLinkId, file);
+            if( linkItemAction != null ){
+                String metaString = MetaItem.makeMetaString(MetaItem.TYPE.PICTURE, linkItemAction.mFileName, "");
+                String metaPath = MetaFile.setMeta(getApplicationContext(), mType, linkItemAction.mID, metaString, false);
+                MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false);
+                refresh_files_fragment();
+            }
+        }
+    }
+
+    private void createLinkeFileFromFile(Intent intent){
+        try {
+            URI uriFile = new URI(intent.toUri(0));
+            File file = new File(uriFile.getPath());
+            LinkItemAction linkItemAction = null;
+            if( file.exists() ){
+                linkItemAction = MediaUtils.createLinkFileFromFile(getApplicationContext(), mLinkId, file);
+                Log.d(TAG, "Create new file link for: " + uriFile.getPath());
+            } else {
+                Log.e(TAG, "File " + uriFile.getPath() + " does not exits!");
+            }
+            if( linkItemAction != null ){
+                String metaString = MetaItem.makeMetaString(MetaItem.TYPE.FILE, linkItemAction.mFileName, "");
+                String metaPath = MetaFile.setMeta(getApplicationContext(), mType, linkItemAction.mID, metaString, false);
+                MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false);
+            }
+            refresh_files_fragment();
+        } catch (URISyntaxException e){
+            Log.e(TAG, e.toString());
+        }
+    }
+
+    private void createLinkFileFromContacts(Intent intent) {
+        if( intent.hasExtra(ContactsActivity.EXTRA_CONTACTS_KEY) ){
             Context context = getApplicationContext();
-            HashMap<String,Contact> contacts = (HashMap<String,Contact>) data.getSerializableExtra(ContactsActivity.EXTRA_CONTACTS_KEY);
+            HashMap<String,Contact> contacts = (HashMap<String,Contact>) intent.getSerializableExtra(ContactsActivity.EXTRA_CONTACTS_KEY);
             LinkItemAction linkItemAction = VCard.createLinkFileFromContacts(context, contacts, mLinkId);
             if( linkItemAction != null ){ // ... if no errors!
                 String metaString = MetaItem.makeMetaString(MetaItem.TYPE.CONTACTS, linkItemAction.mFileName, String.valueOf(contacts.size()));
@@ -196,14 +285,14 @@ public class LinkActivity extends ActionBarActivity {
         }
     }
 
-    private void createLinkFileFromImage(Context context, Intent intent){
+    private void createLinkFileFromImage(Intent intent){
         File file = Utils.getFile4Image(getApplicationContext(), intent);
         if( file == null ){ return ; }
 
-        LinkItemAction linkItemAction = MediaUtils.createLinkFileFromImage(context, file, mLinkId);
+        LinkItemAction linkItemAction = MediaUtils.createLinkFileFromFile(getApplicationContext(), mLinkId, file);
         if( linkItemAction != null ){
             String metaString = MetaItem.makeMetaString(MetaItem.TYPE.PICTURE, linkItemAction.mFileName, "");
-            String metaPath = MetaFile.setMeta(context, mType, linkItemAction.mID, metaString, false);
+            String metaPath = MetaFile.setMeta(getApplicationContext(), mType, linkItemAction.mID, metaString, false);
             MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false);
         }
         refresh_files_fragment();

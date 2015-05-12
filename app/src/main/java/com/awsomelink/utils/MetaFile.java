@@ -21,6 +21,7 @@ import java.util.List;
 public class MetaFile {
     public static final String TAG = "MetaFile";
     public static final String FILE_NAME = "META.TXT";
+    public static final String FILE_NAME_AWSYNC = "META.TXT.AWSYNC";
 
     public static boolean addEmptyMeta(Context context, Links.LINK_TYPE itemType, String linkId){
         try{
@@ -131,7 +132,9 @@ public class MetaFile {
         String resultString = "";
         for(MetaItem.TYPE type:result.keySet()){
             if( !resultString.isEmpty() ){ resultString += " "; }
-            resultString += context.getString(MetaItem.getI18NId(type)) + "(" + result.get(type) + ")" ;
+            if( MetaItem.isFileType(type) ) {
+                resultString += context.getString(MetaItem.getI18NId(type)) + "(" + result.get(type) + ")";
+            }
         }
         Log.d(TAG, "Meta description string: " + resultString);
         return(TextUtils.isEmpty(resultString) ? "-:-" : resultString );
@@ -153,6 +156,10 @@ public class MetaFile {
 
     public static File getMetaFile(Context context, Links.LINK_TYPE itemType, String linkId){
         return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME));
+    }
+
+    public static File getMetaFileAwsync(Context context, Links.LINK_TYPE itemType, String linkId){
+        return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME_AWSYNC));
     }
 
     public static List<MetaItem> getMeta(Context context, Links.LINK_TYPE itemType, String linkId){

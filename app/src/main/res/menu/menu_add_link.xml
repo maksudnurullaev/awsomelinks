@@ -9,8 +9,10 @@
             <item android:id="@+id/dump" android:title="@string/Images"
                 android:orderInCategory="101" app:showAsAction="never" >
                 <menu>
-                    <item android:id="@+id/action_add_link_image_from_camera"
-                        android:orderInCategory="100" android:title="@string/from_camera" />
+                    <item android:id="@+id/action_add_link_image_from_camera_big"
+                        android:orderInCategory="100" android:title="@string/from_camera_big" />
+                    <item android:id="@+id/action_add_link_image_from_camera_small"
+                        android:orderInCategory="100" android:title="@string/from_camera_small" />
                     <item android:id="@+id/action_add_link_image_from_gallery"
                         android:orderInCategory="101" android:title="@string/from_gallery" />
                 </menu>
@@ -24,6 +26,8 @@
                         android:orderInCategory="101" android:title="@string/from_gallery" />
                 </menu>
             </item>
+            <item android:id="@+id/action_add_link_file" android:title="@string/File"
+                android:orderInCategory="102" app:showAsAction="never" />
         </menu>
     </item>
 </menu>

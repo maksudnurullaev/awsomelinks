@@ -68,15 +68,29 @@ public class MetaItem {
         return(result);
     }
 
-    public static int getI18NId(TYPE type){
+    public static boolean isFileType(TYPE type){
         switch(type){
-            case CONTACTS:
-                return R.string.Contacts;
+            case FILE:
             case VIDEO:
-                return R.string.Video;
             case PICTURE:
-                return R.string.Images;
+            case CONTACTS:
+                return true;
         }
-        return R.string.Files;
+        return false;
+    }
+
+    public static int getI18NId(TYPE type){
+        if( isFileType(type) ) {
+            switch (type) {
+                case CONTACTS:
+                    return R.string.Contacts;
+                case VIDEO:
+                    return R.string.Video;
+                case PICTURE:
+                    return R.string.Images;
+            }
+            return R.string.Files;
+        }
+        return R.string.Dump;
     }
 }

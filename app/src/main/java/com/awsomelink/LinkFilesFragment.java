@@ -1,5 +1,6 @@
 package com.awsomelink;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,16 +11,21 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.awsomelink.base.LinkItemAction;
 import com.awsomelink.db.adapters.LinkFilesAdapter;
 import com.awsomelink.dummy.DummyContent;
+import com.awsomelink.utils.AWSyncTask;
 import com.awsomelink.utils.Links;
+
+import java.io.File;
 
 /**
  * Created by m.nurullayev on 03.03.2015.
  */
 
-public class LinkFilesFragment extends Fragment implements RefreshableFragment {
+public class LinkFilesFragment extends Fragment implements RefreshableFragment, View.OnClickListener {
     public static final String TAG = "LinkFilesFragment";
 
     public static final int LINK_CONTACTS_REQUEST_CODE = 1001;
@@ -107,4 +113,34 @@ public class LinkFilesFragment extends Fragment implements RefreshableFragment {
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        Object tag = v.getTag();
+        if (tag instanceof LinkItemAction) {
+            linkItemAction(v, (LinkItemAction) tag);
+        }
+    }
+
+    private void linkItemAction(View v, LinkItemAction linkItemAction){
+        switch(linkItemAction.mLinkAction){
+            case DELETE:
+                File file = Links.getFolderLinkFILESFile(getActivity().getApplicationContext(), linkItemAction.mItemType, linkItemAction.mID, linkItemAction.mFileName);
+                if( file.exists() ){
+                    file.delete();
+                }
+                refresh_list_adapter();
+                break;
+            case MORE:
+                /*
+                Intent i = new Intent(getActivity(), LinkActivity.class);
+                i.putExtra(Links.LINK_ID_KEY, linkItemAction.mID);
+                i.putExtra(Links.LINK_TYPE_KEY, Links.LINK_TYPE.OUT);
+                startActivityForResult(i, LINK_REQUEST_CODE);
+                */
+                Toast.makeText(getActivity().getApplicationContext(), "More action not implemented yet!",Toast.LENGTH_SHORT ).show();
+                break;
+            default:
+                Toast.makeText(getActivity().getApplicationContext(), "Unknown link item action",Toast.LENGTH_SHORT ).show();
+        }
+    }
 }

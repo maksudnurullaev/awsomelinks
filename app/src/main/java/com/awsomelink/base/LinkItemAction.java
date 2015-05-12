@@ -19,6 +19,13 @@ public class LinkItemAction {
         this.mID = id;
         this.mLinkAction = linkAction;
         this.mItemType = dirType;
-
     }
+
+    public LinkItemAction(String id, Links.LINK_ACTION linkAction, Links.LINK_TYPE dirType, String fileName){
+        this.mID = id;
+        this.mLinkAction = linkAction;
+        this.mItemType = dirType;
+        this.mFileName = fileName;
+    }
+
 }

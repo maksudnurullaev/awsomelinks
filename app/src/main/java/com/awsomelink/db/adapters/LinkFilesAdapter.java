@@ -45,29 +45,22 @@ public class LinkFilesAdapter extends ArrayAdapter<String> {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.file_row,parent,false);
         }
         // set ID as title text
-        TextView tcFileName = (TextView)convertView.findViewById(R.id.textViewFileName);
-        tcFileName.setText(fileName);
+        TextView tvFileName = (TextView)convertView.findViewById(R.id.textViewFileName);
+        tvFileName.setText(fileName);
         // set description text
         TextView tvDesc = (TextView)convertView.findViewById(R.id.textDesc);
-        tvDesc.setText(R.string.empty);
+        tvDesc.setText("-:-");
         // set buttons
-        setUpButtonActions(convertView, fileName, R.id.button_more, Links.LINK_ACTION.MORE, mItemsType);
-        setUpButtonActions(convertView, fileName, R.id.button_delete, Links.LINK_ACTION.DELETE, mItemsType);
+        setUpButtonActions(convertView, mLinkId, R.id.button_more, Links.LINK_ACTION.MORE, mItemsType, fileName);
+        setUpButtonActions(convertView, mLinkId, R.id.button_delete, Links.LINK_ACTION.DELETE, mItemsType, fileName);
         return convertView;
     }
 
-    private void setUpButtonActions(View parentItemRow,String id,int viewId, Links.LINK_ACTION linkItemAction, Links.LINK_TYPE linkItemType){
-        setUpButtonActions(parentItemRow,id,viewId,linkItemAction,linkItemType,null);
-    }
-
-    private void setUpButtonActions(View parentItemRow,String id,int viewId, Links.LINK_ACTION linkItemAction, Links.LINK_TYPE linkItemType, String text){
+    private void setUpButtonActions(View parentItemRow,String id,int viewId, Links.LINK_ACTION linkItemAction, Links.LINK_TYPE linkItemType, String fileName){
         Button view = (Button)parentItemRow.findViewById(viewId);
         if( view != null && mFragment != null && mFragment instanceof View.OnClickListener){
             view.setOnClickListener((View.OnClickListener) mFragment);
-            view.setTag(new LinkItemAction(id, linkItemAction, linkItemType));
-            if( text != null ){
-                view.setText(text);
-            }
+            view.setTag(new LinkItemAction(id, linkItemAction, linkItemType, fileName));
         }
     }
 }

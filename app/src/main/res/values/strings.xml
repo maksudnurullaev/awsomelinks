@@ -14,9 +14,11 @@
     <string name="Addresses">Address book</string>
     <string name="Images">Images</string>
     <string name="Video">Video</string>
-    <string name="from_camera">Камера</string>
+    <string name="File">File</string>
+    <string name="from_camera">Camera</string>
+    <string name="from_camera_big">Camera (High quality)</string>
+    <string name="from_camera_small">Camera (Low quality)</string>
     <string name="from_gallery">Галерея</string>
-    <string name="file">Файл</string>
     <string name="Contacts">Contacts</string>
     <string name="Selected">Selected</string>
     <string name="select_all">Select all</string>
@@ -39,4 +41,5 @@
     <string name="Description">Desription</string>
     <string name="Password_Optional">Password (optional)</string>
     <string name="Password">Password</string>
+    <string name="Dump"></string>
 </resources>
