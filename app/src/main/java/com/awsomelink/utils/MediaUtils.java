@@ -26,18 +26,17 @@ import java.util.Map;
 public class MediaUtils {
     public static final String TAG = "MediaFiles";
 
-    public static File createNextLinkJpegfile(Context context, String linkId){
+    public static File createNextLinkJpegfile(Context context, String linkId, boolean isBig){
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "IMAGE_SMALL_" + timeStamp + ".jpeg";
+        String imageFileName = "img_" + (isBig ? "xxx_" : "x_") + timeStamp + ".jpeg";
         String imageFilePath = Links.mkpath(context.getFilesDir().getAbsolutePath(), Links.OUT_FOLDER, linkId, Links.FILES_FOLDER, imageFileName);
-        File file = new File(imageFilePath);
-        return file;
+        return( new File(imageFilePath) );
     }
 
-    public static File createNextLinkJpegBig(){
+    public static File createNextLinkJpegBigTemp(){
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "IMAGE_BIG_" + timeStamp + "_";
+        String imageFileName = "img_xxx_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File image = null;
@@ -55,7 +54,7 @@ public class MediaUtils {
     }
 
     public static LinkItemAction createLinkFileFromCameraImage(Context context, String linkId, Bitmap bitmap){
-        File file = createNextLinkJpegfile(context,linkId);
+        File file = createNextLinkJpegfile(context,linkId, false);
         // 1. new link id
         LinkItemAction linkItemAction = new LinkItemAction(linkId);
         linkItemAction.mFileName = file.getName();
@@ -81,7 +80,7 @@ public class MediaUtils {
         LinkItemAction linkItemAction = new LinkItemAction(linkId);
         linkItemAction.mFileName = file.getName();
         // 2. make folder for new link id
-        File dstFile = new File(context.getFilesDir(),Links.mkpath(Links.OUT_FOLDER,linkId,Links.FILES_FOLDER,file.getName()));
+        File dstFile = createNextLinkJpegfile(context,linkId,true);
         copyFile(file, dstFile);
         return linkItemAction;
     }

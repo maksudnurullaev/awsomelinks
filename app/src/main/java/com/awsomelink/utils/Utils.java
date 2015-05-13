@@ -8,6 +8,10 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by m.nurullayev on 29.04.2015.
@@ -34,4 +38,15 @@ public class Utils {
         }
         return(null);
     }
+
+    public static Map<String,File> fileNamesArray2Map(File[] files){
+        if( files == null || files.length == 0){ return null; }
+
+        Map<String,File> result = new HashMap<>();
+        for(File file:files){
+            result.put(file.getName(), file);
+        }
+        return result;
+    }
+
 }

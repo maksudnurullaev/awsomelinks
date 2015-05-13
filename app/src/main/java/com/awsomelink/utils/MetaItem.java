@@ -68,6 +68,10 @@ public class MetaItem {
         return(result);
     }
 
+    public boolean isFileType(){
+        return( isFileType(mType) );
+    }
+
     public static boolean isFileType(TYPE type){
         switch(type){
             case FILE:

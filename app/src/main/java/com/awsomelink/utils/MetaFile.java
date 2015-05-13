@@ -163,7 +163,7 @@ public class MetaFile {
     }
 
     public static List<MetaItem> getMeta(Context context, Links.LINK_TYPE itemType, String linkId){
-        return(getMeta(getMetaFile(context,itemType,linkId)));
+        return(getMeta(getMetaFile(context, itemType, linkId)));
     }
 
     public static List<MetaItem> getMeta(File file){
@@ -202,5 +202,21 @@ public class MetaFile {
             if(metaItem.mType == type) return metaItem;
         }
         return(null);
+    }
+
+    public static boolean syncLocalFiles(Context context, Links.LINK_TYPE itemType, String linkId){
+        List<MetaItem> metaItems = getMeta(context, itemType, linkId);
+        List<MetaItem> metaItemsResult = new ArrayList<>();
+        for(MetaItem metaItem: metaItems){
+            if(!metaItem.isFileType() || Links.getFolderLinkFILESFile(context, itemType, linkId, metaItem.content).exists() ){
+                metaItemsResult.add(metaItem);
+            }
+        }
+        if( metaItemsResult.size() > 0) {
+            setMeta(context, itemType, linkId, metaItemsResult);
+        } else {
+            addEmptyMeta(context, itemType, linkId);
+        }
+        return(true);
     }
 }

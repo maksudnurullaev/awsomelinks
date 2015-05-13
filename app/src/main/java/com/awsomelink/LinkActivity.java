@@ -156,13 +156,16 @@ public class LinkActivity extends ActionBarActivity {
             case R.id.action_add_link_image_from_camera_big:
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    //startActivityForResult(takePictureIntent,  LINK_IMAGE_FROM_CAMERA_BIG_REQUEST_CODE);
-                    File file = MediaUtils.createNextLinkJpegBig();
-                    mTempFilePath = file.getAbsolutePath();
-                    Log.d(TAG, mTempFilePath);
+                    //File file = MediaUtils.createNextLinkJpegfile(getApplicationContext(), mLinkId, true);
+                    File file = MediaUtils.createNextLinkJpegBigTemp();
                     if( file != null ){
+                        mTempFilePath = file.getAbsolutePath();
+                        Log.d(TAG, "Try to add bit image: " + mTempFilePath);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
                         startActivityForResult(takePictureIntent, LINK_IMAGE_FROM_CAMERA_BIG_REQUEST_CODE);
+                    } else {
+                        Log.e(TAG, "Error due creating bit image: " + mTempFilePath);
+                        mTempFilePath = null;
                     }
                 }
                 break;

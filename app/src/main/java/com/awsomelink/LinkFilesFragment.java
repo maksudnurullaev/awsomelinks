@@ -18,6 +18,7 @@ import com.awsomelink.db.adapters.LinkFilesAdapter;
 import com.awsomelink.dummy.DummyContent;
 import com.awsomelink.utils.AWSyncTask;
 import com.awsomelink.utils.Links;
+import com.awsomelink.utils.MetaFile;
 
 import java.io.File;
 
@@ -128,6 +129,9 @@ public class LinkFilesFragment extends Fragment implements RefreshableFragment, 
                 if( file.exists() ){
                     file.delete();
                 }
+                // TODO ... sync with meta file!
+                MetaFile.syncLocalFiles(getActivity().getApplicationContext(), linkItemAction.mItemType, linkItemAction.mID);
+                // update list view
                 refresh_list_adapter();
                 break;
             case MORE:
