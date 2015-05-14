@@ -279,7 +279,7 @@ public class LinkActivity extends ActionBarActivity {
             Context context = getApplicationContext();
             HashMap<String,Contact> contacts = (HashMap<String,Contact>) intent.getSerializableExtra(ContactsActivity.EXTRA_CONTACTS_KEY);
             LinkItemAction linkItemAction = VCard.createLinkFileFromContacts(context, contacts, mLinkId);
-            if( linkItemAction != null ){ // ... if no errors!
+            if( linkItemAction != null ){
                 String metaString = MetaItem.makeMetaString(MetaItem.TYPE.CONTACTS, linkItemAction.mFileName, String.valueOf(contacts.size()));
                 String metaPath = MetaFile.setMeta(context, Links.LINK_TYPE.OUT, linkItemAction.mID, metaString, false);
                 MetaFile.setMetaAwsync(getApplicationContext(), mLinkId, false);

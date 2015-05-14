@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by m.nurullayev on 23.04.2015.
@@ -158,6 +159,10 @@ public class MetaFile {
         return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME));
     }
 
+    public static File getMetaFileAWSYNC(Context context, Links.LINK_TYPE itemType, String linkId){
+        return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME_AWSYNC));
+    }
+
     public static File getMetaFileAwsync(Context context, Links.LINK_TYPE itemType, String linkId){
         return(Links.getFolderLinkFile(context, itemType, linkId, FILE_NAME_AWSYNC));
     }
@@ -204,7 +209,7 @@ public class MetaFile {
         return(null);
     }
 
-    public static boolean syncLocalFiles(Context context, Links.LINK_TYPE itemType, String linkId){
+    public static void syncWithLocalFiles(Context context, Links.LINK_TYPE itemType, String linkId){
         List<MetaItem> metaItems = getMeta(context, itemType, linkId);
         List<MetaItem> metaItemsResult = new ArrayList<>();
         for(MetaItem metaItem: metaItems){
@@ -217,6 +222,36 @@ public class MetaFile {
         } else {
             addEmptyMeta(context, itemType, linkId);
         }
-        return(true);
+    }
+
+    public static List<File> getUpdateFiles(Context context, Links.LINK_TYPE itemType, String linkId){
+        List<MetaItem> metaItems = getMeta(context, itemType, linkId);
+        File awsyncFile = getMetaFileAWSYNC(context, itemType, linkId);
+        Map<String,MetaItem> mapMetaItemsAwsync = null;
+        List<File> result = new ArrayList<>();
+
+        if( awsyncFile.exists() ) {
+            List<MetaItem> metaItemsAwsync = getMeta(awsyncFile);
+            mapMetaItemsAwsync = getMapByContent(metaItemsAwsync);
+        }
+        for(MetaItem metaItem: metaItems){
+            if( metaItem.isFileType() ){
+                File tempFile = Links.getFolderLinkFILESFile(context, itemType, linkId, metaItem.content);
+                if( tempFile.exists() && (mapMetaItemsAwsync == null || !mapMetaItemsAwsync.containsKey(metaItem.content))) {
+                    result.add(tempFile);
+                }
+            }
+        }
+        return(result);
+    }
+
+    public static Map<String,MetaItem> getMapByContent(List<MetaItem> metaItems){
+        Map<String,MetaItem> result = new HashMap<>();
+        for( MetaItem metaItem:metaItems){
+            if( !TextUtils.isEmpty(metaItem.content) ){
+                result.put(metaItem.content, metaItem);
+            }
+        }
+        return result;
     }
 }

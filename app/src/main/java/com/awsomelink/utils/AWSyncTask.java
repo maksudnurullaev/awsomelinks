@@ -30,16 +30,15 @@ public class AWSyncTask extends AsyncTask<LinkItemAction, Integer, Void> {
     @Override
     protected Void doInBackground(LinkItemAction... params) {
         mLinkItemAction = params[0];
-        File folder = Links.getFolderLinkFILES(mContext, mLinkItemAction.mItemType, mLinkItemAction.mID);
-        Log.d(TAG, "Do AWSync for " + folder.getPath());
         String requestURL = "https://awsome.link/" + mLinkItemAction.mID + "/upload";
-        Log.d(TAG, "Do AWSync URI: " + requestURL + " for " + folder.listFiles().length + " file(s)");
-        // 1. Upload files...
-        for(File f: folder.listFiles()){
+        Log.d(TAG, "Do AWSync URI: " + requestURL );
+        // 1. Upload just new files
+        for(File f: MetaFile.getUpdateFiles(mContext,mLinkItemAction.mItemType,mLinkItemAction.mID)){
             if( !f.exists() || !sendFile2Server(requestURL, f) ){
                 mResult = false;
                 return null;
             }
+            Log.d(TAG,"Upload file: " + f.getName());
         }
         // 2. Upload metafile...
         File metaFile = MetaFile.getMetaFile(mContext, mLinkItemAction.mItemType, mLinkItemAction.mID);

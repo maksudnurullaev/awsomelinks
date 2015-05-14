@@ -1,6 +1,5 @@
 package com.awsomelink;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,15 +7,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.awsomelink.base.LinkItemAction;
 import com.awsomelink.db.adapters.LinkFilesAdapter;
-import com.awsomelink.dummy.DummyContent;
-import com.awsomelink.utils.AWSyncTask;
 import com.awsomelink.utils.Links;
 import com.awsomelink.utils.MetaFile;
 
@@ -129,8 +125,10 @@ public class LinkFilesFragment extends Fragment implements RefreshableFragment, 
                 if( file.exists() ){
                     file.delete();
                 }
-                // TODO ... sync with meta file!
-                MetaFile.syncLocalFiles(getActivity().getApplicationContext(), linkItemAction.mItemType, linkItemAction.mID);
+                // sync meta file content with real exist files
+                MetaFile.syncWithLocalFiles(getActivity().getApplicationContext(), linkItemAction.mItemType, linkItemAction.mID);
+                // set meta awsync option to false
+                MetaFile.setMetaAwsync(getActivity().getApplicationContext(), linkItemAction.mID, false);
                 // update list view
                 refresh_list_adapter();
                 break;

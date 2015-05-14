@@ -28,7 +28,7 @@ public class MediaUtils {
 
     public static File createNextLinkJpegfile(Context context, String linkId, boolean isBig){
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "img_" + (isBig ? "xxx_" : "x_") + timeStamp + ".jpeg";
+        String imageFileName = "img_" + (isBig ? "xxx_" : "") + timeStamp + ".jpeg";
         String imageFilePath = Links.mkpath(context.getFilesDir().getAbsolutePath(), Links.OUT_FOLDER, linkId, Links.FILES_FOLDER, imageFileName);
         return( new File(imageFilePath) );
     }
@@ -36,7 +36,7 @@ public class MediaUtils {
     public static File createNextLinkJpegBigTemp(){
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "img_xxx_" + timeStamp + "_";
+        String imageFileName = "img_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File image = null;

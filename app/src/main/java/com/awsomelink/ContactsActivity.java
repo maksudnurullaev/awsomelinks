@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.awsomelink.base.Contact;
+import com.awsomelink.utils.Links;
 
 import java.util.HashMap;
 
@@ -19,7 +20,7 @@ public class ContactsActivity extends ActionBarActivity implements ContactsFragm
     private static final String TAG = "ContactsActivity";
     private ContactsFragment mContactsFragment = null;
     public static final String EXTRA_CONTACTS_KEY = "contacts";
-
+    private String mLinkId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +32,11 @@ public class ContactsActivity extends ActionBarActivity implements ContactsFragm
             ft.add(R.id.contacts_activity_fragment_place, (Fragment) mContactsFragment);
             ft.commit();
         }
+        Intent intent = getIntent();
+        if( intent.hasExtra(Links.LINK_ID_KEY) ){
+            mLinkId = intent.getStringExtra(Links.LINK_ID_KEY);
+        }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -78,6 +82,9 @@ public class ContactsActivity extends ActionBarActivity implements ContactsFragm
                 if( contacts != null ){
                     Intent intent = new Intent();
                     intent.putExtra(EXTRA_CONTACTS_KEY, contacts);
+                    if( mLinkId != null ){
+                        intent.putExtra(Links.LINK_ID_KEY, mLinkId);
+                    }
                     setResult(RESULT_OK,intent);
                     finish();
                 } else {

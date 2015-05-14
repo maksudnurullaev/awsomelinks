@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -18,11 +20,16 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.awsomelink.base.Contact;
 import com.awsomelink.base.LinkItemAction;
 import com.awsomelink.db.adapters.LinksAdapter;
 import com.awsomelink.utils.AWSyncTask;
 import com.awsomelink.utils.Links;
 import com.awsomelink.utils.MetaFile;
+import com.awsomelink.utils.VCard;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by m.nurullayev on 03.03.2015.
@@ -33,6 +40,7 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
 
     private LinksAdapter linksDirAdapter = null;
     public static final int LINK_REQUEST_CODE = 1005;
+    public static final int LINK_CONTACTS_REQUEST_CODE = 1006;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -112,18 +120,21 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
     }
 
     private void linkItemAction(View v, LinkItemAction linkItemAction){
+        Intent i;
         switch(linkItemAction.mLinkAction){
             case DELETE:
                 yesNoDialog(linkItemAction,getResources().getString(R.string.Are_you_sure));
                 break;
             case MORE:
-                Intent i = new Intent(getActivity(), LinkActivity.class);
+                i = new Intent(getActivity(), LinkActivity.class);
                 i.putExtra(Links.LINK_ID_KEY, linkItemAction.mID);
                 i.putExtra(Links.LINK_TYPE_KEY, Links.LINK_TYPE.OUT);
                 startActivityForResult(i, LINK_REQUEST_CODE);
                 break;
             case SHARE:
-                Toast.makeText(getActivity().getApplicationContext(), "Link SHARE action: " + linkItemAction.mID,Toast.LENGTH_SHORT ).show();
+                i = new Intent(getActivity(),ContactsActivity.class);
+                i.putExtra(Links.LINK_ID_KEY, linkItemAction.mID);
+                startActivityForResult(i, LINK_CONTACTS_REQUEST_CODE);
                 break;
             case AWSYNC:
                 v.setEnabled(false);
@@ -136,14 +147,43 @@ public class OutboxFragment extends Fragment implements MainActivity.ContentFrag
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         Context context = getActivity().getApplicationContext();
         switch (requestCode) {
             case LINK_REQUEST_CODE:
                 refresh_list_adapter();
                 break;
+            case LINK_CONTACTS_REQUEST_CODE:
+                if( intent == null ){ return; }
+                sendSMS(intent);
+                break;
             default:
                 Toast.makeText(context, "Unknown REQEST CODE: " + requestCode, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendSMS(Intent intent){
+        if( intent.hasExtra(ContactsActivity.EXTRA_CONTACTS_KEY) && intent.hasExtra(Links.LINK_ID_KEY)) {
+            String linkId = intent.getStringExtra(Links.LINK_ID_KEY);
+            String requestURL = "https://awsome.link/" + linkId ;
+            HashMap<String, Contact> contacts = (HashMap<String, Contact>) intent.getSerializableExtra(ContactsActivity.EXTRA_CONTACTS_KEY);
+            String smsNumbers = "";
+            for(String key:contacts.keySet()){
+                Map<String,Boolean> phones = contacts.get(key).get_phones();
+                for(String phone: phones.keySet()) {
+                    if( phones.get(phone) ) {
+                        if( !TextUtils.isEmpty(smsNumbers) ) { smsNumbers += ";"; }
+                        smsNumbers += phone;
+                        Log.d(TAG, "Send sms for: " + key + ", number: " + phone + ", text: " + requestURL);
+                    }
+                }
+            }
+            if( !TextUtils.isEmpty(smsNumbers) ){
+                Uri smsToUri = Uri.parse("smsto:" + smsNumbers);
+                Intent smsIntent = new Intent(android.content.Intent.ACTION_SENDTO, smsToUri);
+                smsIntent.putExtra("sms_body", requestURL);
+                startActivity(smsIntent);
+            }
         }
     }
 
